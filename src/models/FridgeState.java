@@ -1,7 +1,10 @@
 package models;
 
+import java.util.regex.Pattern;
+
 public class FridgeState {
 
+    private static Pattern pattern = Pattern.compile("\\d+");
     private int temperature;
     private int dampness;
 
@@ -19,6 +22,10 @@ public class FridgeState {
 
     public void setDampness(int dampness) {
         this.dampness = dampness;
+    }
+
+    public static Pattern getPattern() {
+        return pattern;
     }
 
     @Override

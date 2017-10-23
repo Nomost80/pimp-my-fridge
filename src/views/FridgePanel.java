@@ -13,9 +13,11 @@ class FridgePanel extends JPanel implements Flow.Subscriber<FridgeState> {
     private static final Logger logger = Logger.getLogger("FridgePanel");
     private Flow.Subscription subscription;
     private ArrayList<FridgeState> fridgeStates;
+    private JLabel label = new JLabel();
 
     FridgePanel() {
         this.fridgeStates = new ArrayList<>();
+        this.add(label);
     }
 
     @Override
@@ -27,8 +29,9 @@ class FridgePanel extends JPanel implements Flow.Subscriber<FridgeState> {
 
     @Override
     public void onNext(FridgeState item) {
-        subscription.request(1);
         this.fridgeStates.add(item);
+        this.label.setText(item.toString());
+        subscription.request(1);
     }
 
     @Override
