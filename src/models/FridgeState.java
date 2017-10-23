@@ -1,35 +1,30 @@
 package models;
 
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class FridgeState {
 
-    private static Pattern pattern = Pattern.compile("\\d+");
-    private int temperature;
-    private int dampness;
+    private Date measuredAt;
+    private ArrayList<Measurement> measurements;
 
-    public int getTemperature() {
-        return temperature;
+    public FridgeState() {
+        this.measurements = new ArrayList<>();
     }
 
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
+    public Date getMeasuredAt() {
+        return measuredAt;
     }
 
-    public int getDampness() {
-        return dampness;
+    public void setMeasuredAt(Date measuredAt) {
+        this.measuredAt = measuredAt;
     }
 
-    public void setDampness(int dampness) {
-        this.dampness = dampness;
+    public ArrayList<Measurement> getMeasurements() {
+        return measurements;
     }
 
-    public static Pattern getPattern() {
-        return pattern;
-    }
-
-    @Override
-    public String toString() {
-        return "temperature : " + this.temperature + " - dampness : " + this.dampness;
+    public void setMeasurements(ArrayList<Measurement> measurements) {
+        this.measurements = measurements;
     }
 }

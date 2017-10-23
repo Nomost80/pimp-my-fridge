@@ -1,4 +1,4 @@
-// Example testing sketch for various DHT humidity/temperature sensors
+// Example testing sketch for various DHT humidity/insideTemperature sensors
 // Written by ladyada, public domain
 
 #include "DHT.h"
@@ -34,12 +34,12 @@ void loop() {
   // Wait a few seconds between measurements.
   delay(200);
 
-  // Reading temperature or humidity takes about 250 milliseconds!
+  // Reading insideTemperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
-  // Read temperature as Celsius (the default)
+  // Read insideTemperature as Celsius (the default)
   float t = dht.readTemperature();
-  // Read temperature as Fahrenheit (isFahrenheit = true)
+  // Read insideTemperature as Fahrenheit (isFahrenheit = true)
   float f = dht.readTemperature(true);
 
   // Check if any reads failed and exit early (to try again).
