@@ -1,6 +1,5 @@
 package views;
 
-import com.sun.tools.internal.ws.util.ClassNameInfo;
 import models.FridgeState;
 
 import javax.swing.*;
@@ -11,7 +10,7 @@ import java.util.logging.Logger;
 
 class FridgePanel extends JPanel implements Flow.Subscriber<FridgeState> {
 
-    private static final Logger logger = Logger.getLogger(ClassNameInfo.class.getName());
+    private static final Logger logger = Logger.getLogger("FridgePanel");
     private Flow.Subscription subscription;
     private ArrayList<FridgeState> fridgeStates;
 

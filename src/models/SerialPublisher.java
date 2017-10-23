@@ -1,7 +1,5 @@
 package models;
 
-import com.sun.tools.internal.ws.util.ClassNameInfo;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +10,7 @@ import java.util.logging.Logger;
 
 public class SerialPublisher implements Flow.Publisher<FridgeState> {
 
-    private static final Logger logger = Logger.getLogger(ClassNameInfo.class.getName());
+    private static final Logger logger = Logger.getLogger("SerialPublisher");
     final ExecutorService executorService = Executors.newFixedThreadPool(5);
     private List<SerialSubscription> subscriptions = Collections.synchronizedList(new ArrayList<SerialSubscription>());
     private final CompletableFuture<Void> terminated = new CompletableFuture<>();

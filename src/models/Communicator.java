@@ -1,14 +1,13 @@
 package models;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.sun.tools.internal.ws.util.ClassNameInfo;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Communicator {
 
-    private static final Logger logger = Logger.getLogger(ClassNameInfo.class.getName());
+    private static final Logger logger = Logger.getLogger("Communicator");
     private SerialPort serialPort;
 
     public Communicator() {
