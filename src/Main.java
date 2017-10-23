@@ -1,3 +1,4 @@
+import com.fazecast.jSerialComm.SerialPort;
 import controllers.FridgeManager;
 
 public class Main {
