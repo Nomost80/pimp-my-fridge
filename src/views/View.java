@@ -87,12 +87,19 @@ public class View implements Flow.Subscriber<FridgeState> {
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
         this.subscription = subscription;
+        System.out.println("On est abonné, on demande la 1ère valeur");
         /* It signals that the current Subscriber is ready to consume more messages. */
         subscription.request(1);
     }
 
     @Override
     public void onNext(FridgeState item) {
+        if (item == null)
+        {
+            subscription.request(1);
+            return ;
+        }
+        System.out.println("coucou :)");
         this.label.setText(item.toString());
         this.slider.setValue(item.getBrink());
         this.fridgeStates.add(item);

@@ -70,15 +70,15 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
 
         private void publishItems(long n) {
             for (int i = 0; i < n; i++) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    logger.log(Level.SEVERE, e.toString());
+                }
                 this.executor.execute(() -> {
                     FridgeState fridgeState = communicator.readData();
                     logger.log(Level.INFO, "Publishing item");
                     this.subscriber.onNext(fridgeState);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        logger.log(Level.SEVERE, e.toString());
-                    }
                 });
             }
         }

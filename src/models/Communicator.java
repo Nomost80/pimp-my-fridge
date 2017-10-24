@@ -37,6 +37,7 @@ public class Communicator implements ICommunicator<FridgeState> {
 
     public FridgeState readData() {
         String json = null;
+        System.out.println("coucou, on lit les données");
         try {
             byte[] readBuffer = new byte[this.serialPort.bytesAvailable()];
             this.serialPort.readBytes(readBuffer, readBuffer.length);
@@ -46,10 +47,16 @@ public class Communicator implements ICommunicator<FridgeState> {
                 Je les split puis je récupère une qui est situé entre la première et dernière comme ça on sait qu'on a
                 bien reçu tous les octets qui la compose tout en enlevant le premier caractère qui est un \n
             */
-            json = data.split("\\r")[5].substring(1);
+            String[] dataSplit = data.split("\\r");
+            if (dataSplit.length > 4 )
+            {
+                json = dataSplit[1].substring(1);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (json == null)
+            return null;
         ObjectMapper mapper = new ObjectMapper();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         mapper.setDateFormat(df);
