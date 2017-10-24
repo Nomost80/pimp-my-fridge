@@ -71,7 +71,7 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
         private void publishItems(long n) {
             for (int i = 0; i < n; i++) {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     logger.log(Level.SEVERE, e.toString());
                 }
