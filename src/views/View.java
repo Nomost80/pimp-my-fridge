@@ -28,6 +28,10 @@ public class View implements Flow.Subscriber<FridgeState> {
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setLocationRelativeTo(null);
         this.fridgeStates = new ArrayList<>();
+        this.setResizeable(true);
+        this.setSize(500, 500);
+        this.buildFrame();
+        this.setVisibility(true);
     }
 
     public JFrame getFrame() {
