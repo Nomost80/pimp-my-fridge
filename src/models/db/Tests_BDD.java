@@ -8,7 +8,7 @@ public class Tests_BDD {
         DB_ValuesSensors test = null;
         System.out.println("Main pour tests BDD");
         try {
-            test = new DB_ValuesSensors(DBConnection.getInstance().getConnection());
+            test = new DB_ValuesSensors();
         } catch (SQLException e) {
             e.printStackTrace();
         }

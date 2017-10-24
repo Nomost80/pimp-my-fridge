@@ -14,7 +14,7 @@ import java.awt.*;
 public class TimeSeries_AWT extends ApplicationFrame {
     public TimeSeries_AWT( final String title, DB_ValuesSensors test ) {
         super( title );
-        final XYDataset dataset = test.select_Series("2017-10-24 10:08:30", "2017-10-24 10:09:30");
+        final XYDataset dataset = test.select_Series(null,"2017-10-24 10:08:30", "2017-10-24 10:09:30");
         final JFreeChart chart = createChart( dataset );
         final ChartPanel chartPanel = new ChartPanel( chart );
         chartPanel.setPreferredSize( new java.awt.Dimension( 560 , 370 ) );

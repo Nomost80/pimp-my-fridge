@@ -17,6 +17,7 @@ public class Communicator implements ICommunicator<FridgeState> {
 
     public Communicator() {
         this.serialPort = SerialPort.getCommPorts()[0];
+        this.serialPort.setBaudRate(19200);
     }
 
     public boolean openPort() {

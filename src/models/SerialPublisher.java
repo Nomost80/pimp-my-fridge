@@ -1,5 +1,8 @@
 package models;
 
+import models.db.DB_ValuesSensors;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SerialPublisher implements Flow.Publisher<FridgeState> {
+    static final boolean BDD = true;
+    private DB_ValuesSensors db ;
 
     private static final Logger logger = Logger.getLogger("SerialPublisher");
     final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -18,6 +23,18 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
 
     public SerialPublisher(ICommunicator<FridgeState> communicator) {
         this.communicator = communicator;
+        startBDD();
+    }
+
+    private void startBDD(){
+        if (BDD)
+        {
+            try {
+                this.db = new DB_ValuesSensors();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -78,7 +95,8 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
                 this.executor.execute(() -> {
                     FridgeState fridgeState = communicator.readData();
                     logger.log(Level.INFO, "Publishing item");
-
+                    if (BDD)
+                        db.insertAllValues(fridgeState);
                     this.subscriber.onNext(fridgeState);
                 });
             }
