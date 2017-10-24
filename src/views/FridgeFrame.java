@@ -20,4 +20,8 @@ public class FridgeFrame extends JFrame {
     public FridgePanel getFridgePanel() {
         return fridgePanel;
     }
+
+    public void setVisibility(boolean isVisible) {
+        this.setVisible(isVisible);
+    }
 }

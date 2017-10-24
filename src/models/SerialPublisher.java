@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 public class SerialPublisher implements Flow.Publisher<FridgeState> {
 
     private static final Logger logger = Logger.getLogger("SerialPublisher");
-    final ExecutorService executorService = Executors.newFixedThreadPool(5);
+    final ExecutorService executorService = Executors.newFixedThreadPool(1);
     private List<SerialSubscription> subscriptions = Collections.synchronizedList(new ArrayList<SerialSubscription>());
     private final CompletableFuture<Void> terminated = new CompletableFuture<>();
 
@@ -69,7 +69,7 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
             for (int i = 0; i < n; i++) {
                 this.executor.execute(() -> {
                     FridgeState fridgeState = this.communicator.readData();
-                    logger.log(Level.INFO, "Publish item : " + fridgeState.toString());
+                    logger.log(Level.INFO, "Publishing item");
                     this.subscriber.onNext(fridgeState);
                 });
             }

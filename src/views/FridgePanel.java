@@ -1,5 +1,6 @@
 package views;
 
+import controllers.IFridgeService;
 import models.FridgeState;
 import models.Measurement;
 
@@ -17,11 +18,13 @@ class FridgePanel extends JPanel implements Flow.Subscriber<FridgeState> {
     private JLabel label = new JLabel();
     private boolean shouldInit = true;
     private ArrayList<JLabel> measurementsLabel;
+    private JButton button = new JButton("Send data");
 
     FridgePanel() {
         this.fridgeStates = new ArrayList<>();
         this.measurementsLabel = new ArrayList<>();
-        this.add(label);
+        this.add(this.label);
+        this.add(this.button);
     }
 
     @Override
