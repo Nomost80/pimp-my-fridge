@@ -1,7 +1,6 @@
 package views;
 
 import javax.swing.*;
-import java.util.logging.Logger;
 
 public class FridgeFrame extends JFrame {
 

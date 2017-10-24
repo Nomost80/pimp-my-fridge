@@ -26,7 +26,7 @@ DHT dht(DHTPIN, DHTTYPE);
 void setup() {
   Serial.begin(9600);
   Serial.println("DHTxx test!");
-
+  
   dht.begin();
 }
 

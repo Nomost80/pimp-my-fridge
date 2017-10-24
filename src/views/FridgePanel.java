@@ -1,6 +1,7 @@
 package views;
 
 import models.FridgeState;
+import models.Measurement;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -14,9 +15,12 @@ class FridgePanel extends JPanel implements Flow.Subscriber<FridgeState> {
     private Flow.Subscription subscription;
     private ArrayList<FridgeState> fridgeStates;
     private JLabel label = new JLabel();
+    private boolean shouldInit = true;
+    private ArrayList<JLabel> measurementsLabel;
 
     FridgePanel() {
         this.fridgeStates = new ArrayList<>();
+        this.measurementsLabel = new ArrayList<>();
         this.add(label);
     }
 
@@ -30,7 +34,16 @@ class FridgePanel extends JPanel implements Flow.Subscriber<FridgeState> {
     @Override
     public void onNext(FridgeState item) {
         this.fridgeStates.add(item);
-        this.label.setText(item.toString());
+        this.label.setText(item.getMeasuredAt().toString());
+        if (this.shouldInit) {
+            for (Measurement measurement : item.getMeasurements()) {
+                JLabel measurementLabel = new JLabel();
+                measurementLabel.setText(measurement.toString());
+                this.measurementsLabel.add(measurementLabel);
+                this.add(measurementLabel);
+            }
+            this.shouldInit = false;
+        }
         subscription.request(1);
     }
 

@@ -1,7 +1,11 @@
 package models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fazecast.jSerialComm.SerialPort;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,13 +39,22 @@ public class Communicator implements ICommunicator<FridgeState> {
     public FridgeState readData() {
         Scanner scanner = new Scanner(this.serialPort.getInputStream()).useDelimiter("\n");
         String json = scanner.nextLine();
-        FridgeState fridgeState = new FridgeState();
-        fridgeState.setInsideTemperature(Integer.parseInt(temperature.split(":")[1]));
-        fridgeState.setDampness(Integer.parseInt(dampness.split(":")[1]));
-        return fridgeState;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(json, FridgeState.class);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, e.toString());
+            return null;
+        }
     }
 
     public void writeData(FridgeState fridgeState) {
-        this.serialPort.writeBytes()
+        ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        try {
+            byte[] data = writer.writeValueAsString(fridgeState).getBytes();
+            this.serialPort.writeBytes(data, data.length);
+        } catch (JsonProcessingException e) {
+            logger.log(Level.SEVERE, e.toString());
+        }
     }
 }
