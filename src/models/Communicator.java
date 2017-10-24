@@ -16,13 +16,7 @@ public class Communicator implements ICommunicator<FridgeState> {
     private SerialPort serialPort;
 
     public Communicator() {
-        try {
-            this.serialPort = SerialPort.getCommPorts()[0];
-            if (!this.openPort())
-                throw new Exception("Serial Port not opened");
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, e.toString());
-        }
+        this.serialPort = SerialPort.getCommPorts()[0];
     }
 
     public boolean openPort() {
