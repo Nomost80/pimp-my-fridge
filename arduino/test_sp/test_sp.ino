@@ -10,7 +10,7 @@ void setup() {
 
 void loop() {
   sendData();
-  readData();
+  //readData();
 }
 
 void sendData() {
