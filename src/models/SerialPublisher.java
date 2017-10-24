@@ -78,6 +78,7 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
                 this.executor.execute(() -> {
                     FridgeState fridgeState = communicator.readData();
                     logger.log(Level.INFO, "Publishing item");
+
                     this.subscriber.onNext(fridgeState);
                 });
             }

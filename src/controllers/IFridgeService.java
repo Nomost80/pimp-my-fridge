@@ -1,5 +1,5 @@
 package controllers;
 
 public interface IFridgeService {
-    void addListeners();
+    void control();
 }

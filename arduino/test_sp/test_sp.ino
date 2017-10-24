@@ -5,7 +5,7 @@
 int brink = 18;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
 }
 
 void loop() {
@@ -25,7 +25,7 @@ void sendData() {
   JsonObject& data_3 = data.createNestedObject();
 
   root["measuredAt"] = String(year()) + '-' + String(month()) + '-' + String(day()) + ' ' + String(hour()) + ':' + String(minute()) + ':' + String(second());
-  root["brink"] = 18.5;
+  root["brink"] = random(17, 25);
   
   data_0["sensor"] = "dht22";
   data_0["label"] = "inside temperature";
