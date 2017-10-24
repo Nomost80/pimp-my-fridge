@@ -9,14 +9,18 @@ import views.View;
 public class Main {
 
     public static void main(String[] args) {
-        SerialPublisher serialPublisher = new SerialPublisher();
         ICommunicator<FridgeState> communicator = new Communicator();
-        View view = new View("Fridge Manager");
-        view.setVisibility(true);
-        view.setResizeable(false);
-        view.setSize(500, 500);
-        view.buildFrame();
-        new FridgeService(view, communicator);
-        serialPublisher.subscribe(view);
+            communicator.writeData("test");
+
+
+//        SerialPublisher serialPublisher = new SerialPublisher(communicator);
+//        View view = new View("Fridge Manager");
+//        view.setVisibility(true);
+//        view.setResizeable(false);
+//        view.setSize(500, 500);
+//        view.buildFrame();
+//        IFridgeService fridgeService = new FridgeService(view, communicator);
+//        fridgeService.addListeners();
+//        serialPublisher.subscribe(view);
     }
 }

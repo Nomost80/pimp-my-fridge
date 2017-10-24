@@ -18,6 +18,7 @@ public class View implements Flow.Subscriber<FridgeState> {
     private JSlider slider;
     private JButton button;
     private JLabel label;
+    private JButton stopButton;
 
     public View(String title) {
         this.frame = new JFrame(title);
@@ -44,6 +45,10 @@ public class View implements Flow.Subscriber<FridgeState> {
         this.panel = panel;
     }
 
+    public Flow.Subscription getSubscription() {
+        return subscription;
+    }
+
     public JButton getButton() {
         return button;
     }
@@ -52,13 +57,19 @@ public class View implements Flow.Subscriber<FridgeState> {
         return slider;
     }
 
+    public JButton getStopButton() {
+        return stopButton;
+    }
+
     public void buildFrame() {
         this.slider = new JSlider(10, 30, 18);
         this.button = new JButton("Valider la nouvelle consigne");
         this.label = new JLabel();
+        this.stopButton = new JButton("Stop");
         this.panel.add(this.button);
         this.panel.add(this.slider);
         this.panel.add(this.label);
+        this.panel.add(this.stopButton);
     }
 
     public void setSize(int width, int height) {

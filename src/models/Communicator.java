@@ -1,10 +1,10 @@
 package models;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fazecast.jSerialComm.SerialPort;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
@@ -26,9 +26,8 @@ public class Communicator implements ICommunicator<FridgeState> {
     }
 
     public boolean openPort() {
-        this.serialPort.openPort();
         this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
-        return this.serialPort.isOpen();
+        return this.serialPort.openPort();
     }
 
     public boolean closePort() {
@@ -65,7 +64,8 @@ public class Communicator implements ICommunicator<FridgeState> {
     public void writeData(String data) {
         try {
             byte[] bytes = data.getBytes();
-            this.serialPort.writeBytes(bytes, bytes.length);
+            OutputStream outputStream = this.serialPort.getOutputStream();
+            outputStream.write(bytes);
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.toString());
         }
