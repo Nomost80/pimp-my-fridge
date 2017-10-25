@@ -1,16 +1,24 @@
+#include <LiquidCrystal.h>
 #include <TimeLib.h>
 #include <Time.h>
 #include <ArduinoJson.h>
 
-int brink = 18;
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 void setup() {
   Serial.begin(19200);
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("hello");
+  lcd.setCursor(0, 1);
 }
 
 void loop() {
   sendData();
-  //readData();
+  readData();
 }
 
 void sendData() {
@@ -25,7 +33,7 @@ void sendData() {
   JsonObject& data_3 = data.createNestedObject();
 
   root["measuredAt"] = String(year()) + '-' + String(month()) + '-' + String(day()) + ' ' + String(hour()) + ':' + String(minute()) + ':' + String(second());
-  root["brink"] = random(17, 25);
+  root["brink"] = 19;
   
   data_0["sensor"] = "dht22";
   data_0["label"] = "inside temperature";
@@ -48,14 +56,11 @@ void sendData() {
 }
 
 void readData() {
+  //lcd.print(Serial.available());
+  lcd.setCursor(0, 1);
   if (Serial.available() > 0) {
-    Serial.flush();
-    brink = Serial.readString().toInt();
-    Serial.println(brink);
+    digitalWrite(13, LOW);
+    String data = Serial.readString();
+    lcd.print(data);
   }
 }
-
-//{"measurements":[{"sensor":"dht22","label":"insidetemperature","value":17},{"sensor":"thermistor","label":"outsidetemperature","value":22},{"sensor":"pt100","label":"moduletemperature","value":25},{"sensor":"dht22","label":"dampness","value":53}],"measured_at":"1/1/1970 0:5:44"}
-
-
-
