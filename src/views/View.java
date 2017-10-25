@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 public class View implements Flow.Subscriber<FridgeState> {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static String TITLE ;
     static int hoursPeriodTemperatures = 4;
     static int hoursPeriodDampness = 4;
     private IQuery publisher;
@@ -49,9 +50,10 @@ public class View implements Flow.Subscriber<FridgeState> {
     private JButton stopButton;
 
     public View(final String title) {
+        TITLE = title;
         this.fridgeStates = new ArrayList<>();
 
-        this.buildFrameSettings(title);
+        this.buildFrameSettings();
         this.buildFrameContent();
 
         this.create_ThreadGraphes();
@@ -71,13 +73,12 @@ public class View implements Flow.Subscriber<FridgeState> {
     * WARNING : il est nécessaire de créer les layouts en partant des conteneurs finaux pour remonter jusqu'au conteneur central mainPanel
     */
 
-    private void buildFrameSettings(final String title){
-        this.frame = new JFrame(title);
+    private void buildFrameSettings(){
+        this.frame = new JFrame(TITLE);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizeable(true);
         this.setSize(800, 800);
         this.frame.setLocationRelativeTo(null);
-
     }
 
     private void buildFrameContent(){
@@ -103,7 +104,7 @@ public class View implements Flow.Subscriber<FridgeState> {
         );
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                    .addComponent(this.panel_Titre, 0, (int) Math.round(this.frame.getHeight() * 0.15), Short.MAX_VALUE)
+                    .addComponent(this.panel_Titre, (int) Math.round(this.frame.getHeight() * 0.07), (int) Math.round(this.frame.getHeight() * 0.15), Short.MAX_VALUE)
                     .addGroup(layout.createParallelGroup()
                         .addComponent(this.panel_Graphes, 0, (int) Math.round(this.frame.getHeight() * 0.85), Short.MAX_VALUE)
                         .addComponent(this.panel_Values, 0, (int) Math.round(this.frame.getHeight() * 0.85), Short.MAX_VALUE)
@@ -122,10 +123,25 @@ public class View implements Flow.Subscriber<FridgeState> {
     }
 
     private JPanel buildTitlePanel(){
-        JPanel panel = buildOnePanel(Color.BLUE);
+        JPanel panel = buildOnePanel(Color.WHITE);
         GroupLayout layout = (GroupLayout) panel.getLayout();
-        // Horizontal : 1
-        // Vertical : 0.15
+        JLabel title = new JLabel();
+        title.setText(TITLE);
+        title.setFont(new Font("Comic Sans MS", Font.BOLD, 48));
+        title.setForeground(Color.BLUE);
+        title.setHorizontalAlignment(JLabel.CENTER);
+        title.setHorizontalTextPosition(JLabel.CENTER);
+        title.setVerticalAlignment(JLabel.CENTER);
+        title.setVerticalTextPosition(JLabel.CENTER);
+
+        layout.setHorizontalGroup(      // MAX : 1
+                layout.createSequentialGroup()
+                        .addComponent(title, 0, this.frame.getWidth(), Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(        // MAX : 0.15
+                layout.createSequentialGroup()
+                        .addComponent(title, 0, (int) Math.round(this.frame.getHeight() * 0.1), (int) Math.round(this.frame.getHeight() * 0.15))
+        );
         return panel;
     }
 
