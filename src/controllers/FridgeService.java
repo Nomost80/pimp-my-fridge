@@ -19,12 +19,16 @@ public class FridgeService implements IFridgeService {
     public void control() {
         this.view.getButton().addActionListener(e -> sendData(Integer.toString(view.getSlider().getValue())));
         this.view.getStartButton().addActionListener(e -> {
-            communicator.openPort();
-            publisher.subscribe(view);
+            if (communicator.isSerialPortAvailable()){
+                communicator.openPort();
+                publisher.subscribe(view);
+            }
         });
         this.view.getStopButton().addActionListener(e -> {
-            view.getSubscription().cancel();
-            communicator.closePort();
+            if (communicator.isSerialPortAvailable()){
+                view.getSubscription().cancel();
+                communicator.closePort();
+            }
         });
     }
 

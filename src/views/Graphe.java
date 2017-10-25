@@ -14,13 +14,11 @@ class Graphe {
     private JFreeChart chart;
     private ChartPanel chartPanel;
     private final String title;
-    private final JFrame jFrame;
-    private final String borderLayout;
+    private final JPanel jPanel;
 
-    Graphe(final String name, final JFrame jFrame, String borderLayout) {
+    Graphe(final String name, final JPanel jPanel) {
         this.title = name;
-        this.jFrame = jFrame;
-        this.borderLayout = borderLayout;
+        this.jPanel = jPanel;
     }
 
     void updateGraphe(XYDataset dataset){
@@ -42,8 +40,7 @@ class Graphe {
         renderer.setSeriesStroke(1, new BasicStroke(3));
         renderer.setSeriesStroke(2, new BasicStroke(3));
         renderer.setSeriesStroke(3, new BasicStroke(3));
-        this.jFrame.add(this.chartPanel/*, this.borderLayout*/);
-    //    setContentPane( chartPanel );
+        this.jPanel.add(chartPanel);
     }
 
     private JFreeChart createChart( final XYDataset data ) {
@@ -56,16 +53,4 @@ class Graphe {
                 false,
                 false);
     }
-
-    JPanel getJPanel(){
-        return this.chartPanel;
-    }
-
- /*   public static void content(DB_ValuesSensors test) {
-        final String title = "Time Series Management";
-        final TimeSeries_AWT demo = new TimeSeries_AWT(title, test);
-        demo.pack( );
-        RefineryUtilities.positionFrameRandomly( demo );
-        demo.setVisible( true );
-    }*/
 }
