@@ -1,15 +1,26 @@
 package views;
 
 import models.FridgeState;
+import models.IQuery;
+import org.jfree.data.time.TimeSeriesCollection;
 
 import javax.swing.*;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.Flow;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class View implements Flow.Subscriber<FridgeState> {
-
+    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private IQuery publisher;
+    private Thread thread;
+    private volatile boolean threadActive;
     private static final Logger logger = Logger.getLogger("View");
     private JFrame frame;
     private JPanel panel;
@@ -32,6 +43,67 @@ public class View implements Flow.Subscriber<FridgeState> {
         this.setSize(500, 500);
         this.buildFrame();
         this.setVisibility(true);
+        this.create_ThreadGraphes();
+        this.start_ThreadGraphes();
+    }
+
+    private void create_ThreadGraphes(){
+        this.thread = new Thread("Check Graphes") {
+            public void run() {
+                wait_FirstValue();
+                check_graphes();
+            }
+        };
+    }
+
+    private void start_ThreadGraphes(){
+        this.threadActive = true;
+        this.thread.start();
+    }
+
+    private void stop_ThreadGraphes(){
+        this.threadActive = false;
+    }
+
+    private void wait_FirstValue(){
+        while (fridgeStates.size() == 0)
+        {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void check_graphes(){
+        while (this.threadActive){
+            LocalDateTime now = LocalDateTime.now();
+            String strDateStart = now.minusHours(4).format(formatter);
+            String strDateEnd = now.format(formatter);
+//            System.out.println("Coucou :)");
+//            System.out.println("Start : " + strDateStart);
+//            System.out.println("End : " + strDateEnd);
+            TimeSeriesCollection temperaturesCollection = this.publisher.select_TemperaturesSeries(fridgeStates.get(0), strDateStart, strDateEnd);
+            TimeSeriesCollection dampnessCollection = this.publisher.select_DampnessSerie(fridgeStates.get(0), strDateStart, strDateEnd);
+            repaintGraphe(temperaturesCollection);
+            repaintGraphe(dampnessCollection);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void repaintGraphe(TimeSeriesCollection collection){
+        if (collection != null){
+
+        }
+    }
+
+    public void setIQuery(IQuery publisher){
+        this.publisher = publisher;
     }
 
     public JFrame getFrame() {

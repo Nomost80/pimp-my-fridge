@@ -1,6 +1,7 @@
 package models;
 
 import models.db.DB_ValuesSensors;
+import org.jfree.data.time.TimeSeriesCollection;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,8 +12,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SerialPublisher implements Flow.Publisher<FridgeState> {
-    static final boolean BDD = false;
+public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
+    static final boolean BDD = true;
     private DB_ValuesSensors db ;
 
     private static final Logger logger = Logger.getLogger("SerialPublisher");
@@ -50,6 +51,25 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
         } catch (ExecutionException e) {
             logger.log(Level.SEVERE, e.toString());
         }
+    }
+
+    @Override
+    public TimeSeriesCollection select_TemperaturesSeries(FridgeState fridgeState, String dateStart, String dateEnd) {
+        if (!BDD)
+            return null;
+        return this.db.select_TemperaturesSeries(fridgeState, dateStart, dateEnd);
+    }
+
+    @Override
+    public TimeSeriesCollection select_DampnessSerie(FridgeState fridgeState, String dateStart, String dateEnd) {
+        if (!BDD)
+            return null;
+        return this.db.select_TemperaturesSeries(fridgeState, dateStart, dateEnd);
+    }
+
+    @Override
+    public boolean ckeck_PntRosee() {
+        return true;
     }
 
     private class SerialSubscription implements Flow.Subscription {

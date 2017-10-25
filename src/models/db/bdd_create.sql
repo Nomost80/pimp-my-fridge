@@ -12,13 +12,14 @@ CREATE PROCEDURE `PimpMyFridge_Project`.`insert_Values`
 	(
 		IN val_Times DateTime,
 		IN val_Sensor varChar(25),
+        IN val_Description varChar(50),
 		IN val_Mesure float
 	)
 BEGIN
     SET AUTOCOMMIT = 0 ;
 	START TRANSACTION ;
 		CALL `PimpMyFridge_Project`.`selectAdd_Times` (@ID_Times, val_Times);
-		CALL `PimpMyFridge_Project`.`selectAdd_Sensor` (@ID_Sensor, val_Sensor);
+		CALL `PimpMyFridge_Project`.`selectAdd_Sensor` (@ID_Sensor, val_Sensor, val_Description);
 		INSERT INTO `PimpMyFridge_Project`.`FridgeStates` (`ID_Times`, `ID_Sensor`, `Val`)
 				VALUES	(@ID_Times, @ID_Sensor, val_Mesure);
 	COMMIT ;
@@ -42,12 +43,13 @@ DROP PROCEDURE IF EXISTS `PimpMyFridge_Project`.`selectAdd_Sensor` |
 CREATE PROCEDURE `PimpMyFridge_Project`.`selectAdd_Sensor`
 (
 	OUT ID_Sensor int(11),
-	IN val_Sensor VarChar(25)
+	IN val_Sensor VarChar(25),
+    IN val_Description VarChar(50)
 )
 BEGIN
-	SET ID_Sensor = (SELECT `Sensors`.`ID_Sensor` FROM `PimpMyFridge_Project`.`Sensors` WHERE (`Sensors`.`Sensor` = val_Sensor));
+	SET ID_Sensor = (SELECT `Sensors`.`ID_Sensor` FROM `PimpMyFridge_Project`.`Sensors` WHERE ((`Sensors`.`Sensor` = val_Sensor) && (`Sensors`.`Description` = val_Description)));
     IF (ID_Sensor IS NULL) THEN
-		INSERT INTO `PimpMyFridge_Project`.`Sensors` (`Sensor`) VALUES	(val_Sensor);
+		INSERT INTO `PimpMyFridge_Project`.`Sensors` (`Sensor`, `Description`) VALUES	(val_Sensor, val_Description);
         SET ID_Sensor = (SELECT `Sensors`.`ID_Sensor` FROM `PimpMyFridge_Project`.`Sensors` ORDER BY `Sensors`.`ID_Sensor` DESC LIMIT 1);
 	END IF ;
 END |
@@ -56,13 +58,14 @@ DROP PROCEDURE IF EXISTS `PimpMyFridge_Project`.`select_ValuesFromSensor` |
 CREATE PROCEDURE `PimpMyFridge_Project`.`select_ValuesFromSensor`
 (
 	IN val_Sensor VarChar(25),
+    IN val_Description VarChar(50),
     IN DateStart DateTime,
     IN DateEnd DateTime
 )
 BEGIN
 	SELECT `T`.`Times`, `FridgeStates`.`Val` FROM `PimpMyFridge_Project`.`FridgeStates` 
-				NATURAL JOIN (SELECT * FROM `PimpMyFridge_Project`.`Times` WHERE (DateStart <= `Times`.`Times`) && (DateEnd >= `Times`.`Times`)) AS `T`
-				NATURAL JOIN (SELECT * FROM `PimpMyFridge_Project`.`Sensors` WHERE (val_Sensor = `Sensors`.`Sensor`)) AS `S`;
+				NATURAL JOIN (SELECT * FROM `PimpMyFridge_Project`.`Times` WHERE ((DateStart <= `Times`.`Times`) && (DateEnd >= `Times`.`Times`))) AS `T`
+				NATURAL JOIN (SELECT * FROM `PimpMyFridge_Project`.`Sensors` WHERE ((val_Sensor = `Sensors`.`Sensor`) && (`Sensors`.`Description` = val_Description))) AS `S`;
 END |
 
 DROP PROCEDURE IF EXISTS `PimpMyFridge_Project`.`select_SensorDescription` |
@@ -96,7 +99,7 @@ DROP Table IF EXISTS `PimpMyFridge_Project`.`Sensors`;
 CREATE TABLE IF NOT EXISTS `PimpMyFridge_Project`.`Sensors`(
         ID_Sensor int (11) Auto_increment  NOT NULL ,
 		Sensor VarChar(25) NOT NULL,
-        Description VarChar(50),
+        Description VarChar(50) NOT NULL,
         PRIMARY KEY (ID_Sensor)
 )ENGINE=InnoDB;
 
