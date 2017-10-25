@@ -1,17 +1,16 @@
 package views;
 
+import javafx.scene.Group;
+import models.Enum_AlarmStates;
 import models.FridgeState;
 import models.IQuery;
 import org.jfree.data.time.TimeSeriesCollection;
 
 import javax.swing.*;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.Flow;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,28 +22,160 @@ public class View implements Flow.Subscriber<FridgeState> {
     private volatile boolean threadActive;
     private static final Logger logger = Logger.getLogger("View");
     private JFrame frame;
-    private JPanel panel;
+    private JPanel mainPanel;
+    private JPanel panel_Titre;
+    private JPanel panel_Graphes;
+    private JPanel panel_Values;
     private Flow.Subscription subscription;
     private ArrayList<FridgeState> fridgeStates;
     private JSlider slider;
     private JButton button;
     private JLabel label;
+
+    private Graphe graphTemperatures;
+    private Graphe graphDampness;
     private JButton startButton;
     private JButton stopButton;
 
-    public View(String title) {
-        this.frame = new JFrame(title);
-        this.panel = new JPanel();
-        this.frame.setContentPane(this.panel);
-        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.frame.setLocationRelativeTo(null);
+    public View(final String title) {
         this.fridgeStates = new ArrayList<>();
-        this.setResizeable(true);
-        this.setSize(500, 500);
-        this.buildFrame();
-        this.setVisibility(true);
+
+        this.buildFrameSettings(title);
+        this.buildFrameContent();
+
         this.create_ThreadGraphes();
         this.start_ThreadGraphes();
+        this.create_Graphes();
+
+        this.setVisibility(true);
+    }
+
+    /*
+    * Hiérarchie des panels :
+    *       mainPanel contient :
+    *               panel_Titre
+    *               panel_Graphes
+    *               panel_Values
+    *
+    * WARNING : il est nécessaire de créer les layouts en partant des conteneurs finaux pour remonter jusqu'au conteneur central mainPanel
+    */
+
+    private void buildFrameSettings(final String title){
+        this.frame = new JFrame(title);
+        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame.setLocationRelativeTo(null);
+        this.setResizeable(true);
+        this.setSize(800, 800);
+    }
+
+    private void buildFrameContent(){
+        this.panel_Titre = buildTitlePanel();
+        this.panel_Graphes = buildGraphesPanel();
+        this.panel_Values = buildValuesPanel();
+        this.mainPanel = buildMainPanel();
+        this.frame.setContentPane(this.mainPanel);
+    }
+
+    private JPanel buildMainPanel(){
+        JPanel panel = new JPanel();
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        panel.setBackground(Color.BLACK);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup()
+                    .addComponent(this.panel_Titre, 0, this.frame.getWidth(), Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(this.panel_Graphes, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
+                        .addComponent(this.panel_Values, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                    )
+        );
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                    .addComponent(this.panel_Titre, 0, (int) Math.round(this.frame.getHeight() * 0.15), Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup()
+                        .addComponent(this.panel_Graphes, 0, (int) Math.round(this.frame.getHeight() * 0.85), Short.MAX_VALUE)
+                        .addComponent(this.panel_Values, 0, (int) Math.round(this.frame.getHeight() * 0.85), Short.MAX_VALUE)
+                    )
+        );
+        return panel;
+    }
+
+    private JPanel buildOnePanel(Color color){
+        JPanel panel = new JPanel();
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        setAutoGapsGroupLayout(panel);
+        panel.setBackground(color);
+        return panel;
+    }
+
+    private JPanel buildTitlePanel(){
+        JPanel panel = buildOnePanel(Color.BLUE);
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+        // Horizontal : 1
+        // Vertical : 0.15
+        return panel;
+    }
+
+    private JPanel buildGraphesPanel(){
+        JPanel panel = buildOnePanel(Color.RED);
+        this.startButton = new JButton("Start");
+        this.stopButton = new JButton("Stop");
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+        layout.setHorizontalGroup(  // MAX : 0.6
+                layout.createSequentialGroup()
+                        .addComponent(this.startButton, 0, (int) Math.round(this.frame.getWidth() * 0.1), (int) Math.round(this.frame.getWidth() * 0.1))
+                        .addComponent(this.stopButton, 0, (int) Math.round(this.frame.getWidth() * 0.1), (int) Math.round(this.frame.getWidth() * 0.1))
+        );
+        layout.setVerticalGroup(    // MAX : 0.85
+                layout.createParallelGroup()
+                        .addComponent(this.startButton, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
+                        .addComponent(this.stopButton, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
+        );
+        return panel;
+    }
+
+    private JPanel buildValuesPanel(){
+        JPanel panel = buildOnePanel(Color.YELLOW);
+        this.slider = new JSlider(10, 30, 18);
+        this.button = new JButton("Valider la nouvelle consigne");
+        this.label = new JLabel();
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+        layout.setHorizontalGroup(      // MAX : 0.4
+                layout.createParallelGroup()
+                        .addComponent(this.slider, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.button, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.label, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(        // MAX : 0.85
+                layout.createSequentialGroup()
+                        .addComponent(this.slider, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.button, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.label, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+        );
+        return panel;
+    }
+
+    private void setAutoGapsGroupLayout(JPanel panel){
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+        layout.setAutoCreateGaps(true);        // Ecart entre les éléments
+        layout.setAutoCreateContainerGaps(true);   // Ecart entre les éléments et le conteneur
+    }
+
+    private void layoutSettings(){ // https://docs.oracle.com/javase/tutorial/uiswing/layout/group.html
+
+      /*  this.layout.setHorizontalGroup(
+                this.layout.createSequentialGroup()
+                    .addGroup(this.layout.createParallelGroup()
+                        .addComponent())
+        );*/
+    }
+
+    private void create_Graphes(){
+        this.graphTemperatures = new Graphe("Temperatures", this.frame, BorderLayout.WEST);
+        this.graphDampness = new Graphe("Dampness", this.frame, BorderLayout.WEST);
+    //    this.frame.add(this.graphTemperatures.getJPanel());
+      //  this.labelGraphTemperatures.setText("Graphique");
     }
 
     private void create_ThreadGraphes(){
@@ -86,8 +217,8 @@ public class View implements Flow.Subscriber<FridgeState> {
 //            System.out.println("End : " + strDateEnd);
             TimeSeriesCollection temperaturesCollection = this.publisher.select_TemperaturesSeries(fridgeStates.get(0), strDateStart, strDateEnd);
             TimeSeriesCollection dampnessCollection = this.publisher.select_DampnessSerie(fridgeStates.get(0), strDateStart, strDateEnd);
-            repaintGraphe(temperaturesCollection);
-            repaintGraphe(dampnessCollection);
+            repaintGraphe(temperaturesCollection, this.graphTemperatures);
+            repaintGraphe(dampnessCollection, this.graphDampness);
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e){
@@ -96,30 +227,14 @@ public class View implements Flow.Subscriber<FridgeState> {
         }
     }
 
-    private void repaintGraphe(TimeSeriesCollection collection){
+    private void repaintGraphe(TimeSeriesCollection collection, Graphe graphe){
         if (collection != null){
-
+            graphe.updateGraphe(collection);
         }
     }
 
     public void setIQuery(IQuery publisher){
         this.publisher = publisher;
-    }
-
-    public JFrame getFrame() {
-        return frame;
-    }
-
-    public void setFrame(JFrame frame) {
-        this.frame = frame;
-    }
-
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    public void setPanel(JPanel panel) {
-        this.panel = panel;
     }
 
     public Flow.Subscription getSubscription() {
@@ -142,19 +257,6 @@ public class View implements Flow.Subscriber<FridgeState> {
         return startButton;
     }
 
-    public void buildFrame() {
-        this.slider = new JSlider(10, 30, 18);
-        this.button = new JButton("Valider la nouvelle consigne");
-        this.label = new JLabel();
-        this.startButton = new JButton("Start");
-        this.stopButton = new JButton("Stop");
-        this.panel.add(this.button);
-        this.panel.add(this.slider);
-        this.panel.add(this.label);
-        this.panel.add(this.startButton);
-        this.panel.add(this.stopButton);
-    }
-
     public void setSize(int width, int height) {
         this.frame.setSize(width, height);
     }
@@ -165,6 +267,16 @@ public class View implements Flow.Subscriber<FridgeState> {
 
     public void setResizeable(boolean isResizeable) {
         this.frame.setResizable(isResizeable);
+    }
+
+    private void updateDampnessAlarm(Enum_AlarmStates alarmState){
+        System.out.println("AlarmState : " + alarmState.toString());
+        switch (alarmState){
+            case GOOD: break;
+            case WARNING: break;
+            case CRITICAL: break;
+            default: break;
+        }
     }
 
     @Override
@@ -186,6 +298,8 @@ public class View implements Flow.Subscriber<FridgeState> {
         this.label.setText(item.toString());
         this.slider.setValue(item.getBrink());
         this.fridgeStates.add(item);
+        /*this.xxxx.setText(*/this.publisher.pntRosee_Value(item)/*)*/;
+        this.updateDampnessAlarm(this.publisher.pntRosee_Alarm(item));
         subscription.request(1);
     }
 

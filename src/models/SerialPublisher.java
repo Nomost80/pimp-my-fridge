@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -64,12 +65,40 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
     public TimeSeriesCollection select_DampnessSerie(FridgeState fridgeState, String dateStart, String dateEnd) {
         if (!BDD)
             return null;
-        return this.db.select_TemperaturesSeries(fridgeState, dateStart, dateEnd);
+        return this.db.select_DampnessSerie(fridgeState, dateStart, dateEnd);
     }
 
     @Override
-    public boolean ckeck_PntRosee() {
-        return true;
+    public double pntRosee_Value(FridgeState fridgeState) {
+        float h = 0;
+        float t = 0;
+        for (Measurement measurement : fridgeState.getMeasurements()){
+            if (Objects.equals(measurement.getLabel(), "Dampness"))
+                h = measurement.getValue();
+            if (Objects.equals(measurement.getLabel(), "Inside temperature"))
+                t = measurement.getValue();
+        }
+     //   System.out.println("Température intérieure : " + t);
+     //   System.out.println("Humidité : " + h);
+        return Math.pow(h/100,1.0/8.0)*(112+(0.9*t))+(0.1 * t)-112;
+    }
+
+    @Override
+    public Enum_AlarmStates pntRosee_Alarm(FridgeState fridgeState) {
+        double pntRosee = pntRosee_Value(fridgeState);
+        float t = 0;
+        for (Measurement measurement : fridgeState.getMeasurements()){
+            if (Objects.equals(measurement.getLabel(), "Module temperature"))
+                t = measurement.getValue();
+        }
+    //    System.out.println("Température module : " + t);
+    //    System.out.println("PntRosee : " + pntRosee);
+        if (t > (pntRosee + 1) )
+            return Enum_AlarmStates.GOOD;
+        else if ((t <= (pntRosee + 1)) && (t > pntRosee))
+            return Enum_AlarmStates.WARNING;
+        else
+            return Enum_AlarmStates.CRITICAL;
     }
 
     private class SerialSubscription implements Flow.Subscription {

@@ -36,20 +36,20 @@ void sendData() {
   root["brink"] = 19;
   
   data_0["sensor"] = "dht22";
-  data_0["label"] = "inside temperature";
-  data_0["value"] = random(17, 20);
+  data_0["label"] = "Inside temperature";
+  data_0["value"] = random(20, 20);
 
   data_1["sensor"] = "thermistor";
-  data_1["label"] = "outside temperature";
+  data_1["label"] = "Outside temperature";
   data_1["value"] = random(21, 23);
 
   data_2["sensor"] = "pt100";
-  data_2["label"] = "module temperature";
-  data_2["value"] = random(24, 27);
+  data_2["label"] = "Module temperature";
+  data_2["value"] = random(14, 14);
 
   data_3["sensor"] = "dht22";
-  data_3["label"] = "dampness";
-  data_3["value"] = random(40, 60);
+  data_3["label"] = "Dampness";
+  data_3["value"] = random(70, 90);
   
   root.printTo(Serial);
   Serial.println("\n");

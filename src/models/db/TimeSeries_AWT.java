@@ -33,6 +33,7 @@ public class TimeSeries_AWT extends ApplicationFrame {
         final String title = "Time Series Management";
         final TimeSeries_AWT demo = new TimeSeries_AWT(title, test);
         demo.pack( );
+        int a = 0;
         RefineryUtilities.positionFrameRandomly( demo );
         demo.setVisible( true );
     }
