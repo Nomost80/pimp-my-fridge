@@ -9,6 +9,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 
 import java.sql.*;
+import java.util.Objects;
 
 public class DB_ValuesSensors extends DBEntity<Value>{
 
@@ -67,6 +68,7 @@ public class DB_ValuesSensors extends DBEntity<Value>{
             {
                 insertOneValue(date, measurement.getSensor(), measurement.getLabel(), measurement.getValue());
             }
+            insertOneValue(date, "Brink", "Brink Temperature", fridgeState.getBrink());
         }
     }
 
@@ -86,11 +88,26 @@ public class DB_ValuesSensors extends DBEntity<Value>{
         return false;
     }
 
-    public TimeSeriesCollection select_Series(FridgeState fridgeState, String dateStart, String dateEnd){
+    public TimeSeriesCollection select_TemperaturesSeries(FridgeState fridgeState, String dateStart, String dateEnd){
         TimeSeriesCollection col = new TimeSeriesCollection();
         for (Measurement measurement : fridgeState.getMeasurements())
         {
-            col.addSeries(select_Serie(measurement.getSensor(), measurement.getLabel(), dateStart, dateEnd));
+            if (!Objects.equals(measurement.getLabel(), "Dampness"))
+            {
+                col.addSeries(select_Serie(measurement.getSensor(), measurement.getLabel(), dateStart, dateEnd));
+            }
+        }
+        return col;
+    }
+
+    public TimeSeriesCollection select_DampnessSerie(FridgeState fridgeState, String dateStart, String dateEnd){
+        TimeSeriesCollection col = new TimeSeriesCollection();
+        for (Measurement measurement : fridgeState.getMeasurements())
+        {
+            if (Objects.equals(measurement.getLabel(), "Dampness"))
+            {
+                col.addSeries(select_Serie(measurement.getSensor(), measurement.getLabel(), dateStart, dateEnd));
+            }
         }
         return col;
     }
@@ -100,9 +117,9 @@ public class DB_ValuesSensors extends DBEntity<Value>{
         try {
             final CallableStatement call = this.getConnection().prepareCall(QueryDB.selectValuesFromSensor());
             call.setString(1, sensorName);
-            call.setString(1, description);
-            call.setString(2, dateStart);
-            call.setString(3, dateEnd);
+            call.setString(2, description);
+            call.setString(3, dateStart);
+            call.setString(4, dateEnd);
             call.execute();
             final ResultSet resultSet = call.getResultSet();
             while (resultSet.next()) {

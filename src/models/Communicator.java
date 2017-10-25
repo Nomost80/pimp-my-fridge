@@ -2,16 +2,18 @@ package models;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fazecast.jSerialComm.SerialPort;
+import models.db.DB_ValuesSensors;
+import org.jfree.data.time.TimeSeriesCollection;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Communicator implements ICommunicator<FridgeState> {
-
     private static final Logger logger = Logger.getLogger("Communicator");
     private SerialPort serialPort;
 
