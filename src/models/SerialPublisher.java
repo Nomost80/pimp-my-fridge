@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SerialPublisher implements Flow.Publisher<FridgeState> {
-    static final boolean BDD = true;
+    static final boolean BDD = false;
     private DB_ValuesSensors db ;
 
     private static final Logger logger = Logger.getLogger("SerialPublisher");
@@ -65,8 +65,13 @@ public class SerialPublisher implements Flow.Publisher<FridgeState> {
             this.isCanceled = new AtomicBoolean(false);
         }
 
+        public AtomicBoolean getIsCanceled() {
+            return isCanceled;
+        }
+
         @Override
         public void request(long n) {
+            logger.log(Level.INFO, "request => isCanceled : " + this.isCanceled.get());
             if (this.isCanceled.get())
                 return;
             if (n < 0)

@@ -1,9 +1,6 @@
 package controllers;
 
-import models.Communicator;
-import models.FridgeState;
-import models.ICommunicator;
-import models.SerialPublisher;
+import models.*;
 import views.View;
 
 import java.awt.event.ActionEvent;
@@ -12,8 +9,8 @@ import java.awt.event.ActionListener;
 public class FridgeService implements IFridgeService {
 
     private View view;
-    private ICommunicator<FridgeState> communicator;
-    private SerialPublisher publisher;
+    private static final ICommunicator<FridgeState> communicator = new Communicator();
+    private static final SerialPublisher publisher = new SerialPublisher(communicator);
 
     public FridgeService(View view) {
         this.view = view;
@@ -23,8 +20,6 @@ public class FridgeService implements IFridgeService {
     public void control() {
         this.view.getButton().addActionListener(e -> sendData(Integer.toString(view.getSlider().getValue())));
         this.view.getStartButton().addActionListener(e -> {
-            communicator = new Communicator();
-            publisher = new SerialPublisher(communicator);
             communicator.openPort();
             publisher.subscribe(view);
         });
