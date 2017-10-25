@@ -1,9 +1,9 @@
 package views;
 
-import javafx.scene.Group;
 import models.Enum_AlarmStates;
 import models.FridgeState;
 import models.IQuery;
+import models.Measurement;
 import org.jfree.data.time.TimeSeriesCollection;
 
 import javax.swing.*;
@@ -11,6 +11,7 @@ import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.Flow;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +31,15 @@ public class View implements Flow.Subscriber<FridgeState> {
     private ArrayList<FridgeState> fridgeStates;
     private JSlider slider;
     private JButton button;
-    private JLabel label;
+    private JLabel sliderValue;
+    private JProgressBar progressBar;
+    private JLabel insideTemp;
+    private JLabel moduleTemp;
+    private JLabel outsideTemp;
+    private JLabel dampness;
+    private JLabel ptRosee;
+    private JLabel currentBrink;
+    private JLabel pbTitle;
 
     private Graphe graphTemperatures;
     private Graphe graphDampness;
@@ -138,20 +147,47 @@ public class View implements Flow.Subscriber<FridgeState> {
     private JPanel buildValuesPanel(){
         JPanel panel = buildOnePanel(Color.YELLOW);
         this.slider = new JSlider(10, 30, 18);
+        this.slider.setToolTipText("Min : " + this.slider.getMinimum() + " - Max : " + this.slider.getMinimum());
+        this.slider.addChangeListener(e -> sliderValue.setText(Integer.toString(slider.getValue())));
         this.button = new JButton("Valider la nouvelle consigne");
-        this.label = new JLabel();
+        this.pbTitle = new JLabel("Progression de l'atteinte de la consigne :");
+        this.sliderValue = new JLabel(Integer.toString(this.slider.getValue()));
+        this.progressBar = new JProgressBar();
+        this.insideTemp = new JLabel("Température interne : ");
+        this.moduleTemp = new JLabel("Température du module : ");
+        this.outsideTemp = new JLabel("Température extérieur : ");
+        this.dampness = new JLabel("Humidité (%) : ");
+        this.ptRosee = new JLabel("Point de rosée : ");
+        this.currentBrink = new JLabel("Consigne actuelle : ");
         GroupLayout layout = (GroupLayout) panel.getLayout();
         layout.setHorizontalGroup(      // MAX : 0.4
                 layout.createParallelGroup()
+                        .addComponent(this.currentBrink, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.slider, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.sliderValue, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.button, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
-                        .addComponent(this.label, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.pbTitle, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.progressBar, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.insideTemp, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.moduleTemp, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.outsideTemp, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.dampness, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.ptRosee, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
         );
         layout.setVerticalGroup(        // MAX : 0.85
                 layout.createSequentialGroup()
+                        .addComponent(this.currentBrink, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.slider, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.sliderValue, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.button, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
-                        .addComponent(this.label, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.pbTitle, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.progressBar, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.insideTemp, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.moduleTemp, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.outsideTemp, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.dampness, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.ptRosee, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+
         );
         return panel;
     }
@@ -274,8 +310,41 @@ public class View implements Flow.Subscriber<FridgeState> {
         switch (alarmState){
             case GOOD: break;
             case WARNING: break;
-            case CRITICAL: break;
+            case CRITICAL:
+                JOptionPane optionPane = new JOptionPane();
+                optionPane.showMessageDialog(null, "Il y a de la condensation !",
+                        "Attention", JOptionPane.WARNING_MESSAGE);
+                break;
             default: break;
+        }
+    }
+
+    private void updateProgressBar(FridgeState fridgeState) {
+        int pbMin = 0;
+        for (Measurement measurement : this.fridgeStates.get(0).getMeasurements()) {
+            if (Objects.equals(measurement.getLabel(), "Inside temperature"))
+                pbMin = (int)measurement.getValue();
+        }
+        int pbValue = 0;
+        for (Measurement measurement : fridgeState.getMeasurements()) {
+            if (Objects.equals(measurement.getLabel(), "Inside temperature"))
+                pbValue = (int)measurement.getValue();
+        }
+        this.progressBar.setMinimum(pbMin);
+        this.progressBar.setMaximum(fridgeState.getBrink());
+        this.progressBar.setValue(pbValue);
+    }
+
+    private void updateLabels(FridgeState fridgeState) {
+        for (Measurement measurement : fridgeState.getMeasurements()) {
+            if (Objects.equals(measurement.getLabel(), "Inside temperature"))
+                this.insideTemp.setText(this.insideTemp.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
+            if (Objects.equals(measurement.getLabel(), "Module temperature"))
+                this.moduleTemp.setText(this.moduleTemp.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
+            if (Objects.equals(measurement.getLabel(), "Outside temperature"))
+                this.outsideTemp.setText(this.outsideTemp.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
+            if (Objects.equals(measurement.getLabel(), "Dampness"))
+                this.dampness.setText(this.dampness.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
         }
     }
 
@@ -295,10 +364,11 @@ public class View implements Flow.Subscriber<FridgeState> {
             return ;
         }
         System.out.println("coucou :)");
-        this.label.setText(item.toString());
-        this.slider.setValue(item.getBrink());
         this.fridgeStates.add(item);
-        /*this.xxxx.setText(*/this.publisher.pntRosee_Value(item)/*)*/;
+        this.currentBrink.setText(this.currentBrink.getText().split(":")[0] + ": " + Integer.toString(item.getBrink()));
+        this.updateProgressBar(item);
+        this.updateLabels(item);
+        this.ptRosee.setText(this.ptRosee.getText().split(":")[0] + ": " + this.publisher.pntRosee_Value(item));
         this.updateDampnessAlarm(this.publisher.pntRosee_Alarm(item));
         subscription.request(1);
     }
