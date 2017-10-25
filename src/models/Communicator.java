@@ -16,10 +16,28 @@ import java.util.logging.Logger;
 public class Communicator implements ICommunicator<FridgeState> {
     private static final Logger logger = Logger.getLogger("Communicator");
     private SerialPort serialPort;
+    private boolean serialPortAvailable = false;
 
     public Communicator() {
-        this.serialPort = SerialPort.getCommPorts()[0];
-        this.serialPort.setBaudRate(19200);
+        selectSerialPort();
+    }
+
+    private void selectSerialPort(){
+        if (SerialPort.getCommPorts().length > 0)
+        {
+            this.serialPort = SerialPort.getCommPorts()[0];
+            this.serialPort.setBaudRate(19200);
+            this.serialPortAvailable = true;
+        }
+        else
+        {
+            System.out.println("Aucun port série disponible ! :/");
+            this.serialPortAvailable = false;
+        }
+    }
+
+    public boolean isSerialPortAvailable(){
+        return serialPortAvailable;
     }
 
     public boolean openPort() {
