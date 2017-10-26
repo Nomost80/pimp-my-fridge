@@ -222,7 +222,7 @@ public class View implements Flow.Subscriber<FridgeState> {
     private JPanel buildValuesPanel(){
         JPanel panel = buildOnePanel(Color.YELLOW);
         this.slider = new JSlider(10, 30, 18);
-        this.slider.setToolTipText("Min : " + this.slider.getMinimum() + " - Max : " + this.slider.getMinimum());
+        this.slider.setToolTipText("Min : " + this.slider.getMinimum() + " - Max : " + this.slider.getMaximum());
         this.slider.addChangeListener(e -> sliderValue.setText(Integer.toString(slider.getValue())));
         this.button = new JButton("Valider la nouvelle consigne");
         this.pbTitle = new JLabel("Progression de l'atteinte de la consigne :");
@@ -415,7 +415,7 @@ public class View implements Flow.Subscriber<FridgeState> {
                 pbValue = (int)measurement.getValue();
         }
         this.progressBar.setMinimum(pbMin);
-        this.progressBar.setMaximum(fridgeState.getBrink());
+        this.progressBar.setMaximum((int) fridgeState.getBrink());
         this.progressBar.setValue(pbValue);
     }
 
@@ -449,7 +449,7 @@ public class View implements Flow.Subscriber<FridgeState> {
         }
         System.out.println("coucou :)");
         this.fridgeStates.add(item);
-        this.currentBrink.setText(this.currentBrink.getText().split(":")[0] + ": " + Integer.toString(item.getBrink()));
+        this.currentBrink.setText(this.currentBrink.getText().split(":")[0] + ": " + Float.toString(item.getBrink()));
         this.updateProgressBar(item);
         this.updateLabels(item);
         this.ptRosee.setText(this.ptRosee.getText().split(":")[0] + ": " + this.publisher.pntRosee_Value(item));

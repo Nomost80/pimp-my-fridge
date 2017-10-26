@@ -42,24 +42,25 @@ void setup() {
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
   input = dht.readTemperature();
-  brink = 20;
+  brink = 18;
   pid.SetMode(AUTOMATIC);
 }
 
 void loop() {
   input = dht.readTemperature();
-  Serial.print("Input : ");
-  Serial.println(input);
+ // Serial.print("Input : ");
+ // Serial.println(input);
 
   pid.Compute();
   
   output = 255 - output;
-  Serial.print("Output : ");
-  Serial.println(output);
+ // Serial.print("Output : ");
+ // Serial.println(output);
 
   analogWrite(MOSFET_PIN, output);
   buildData(dht.readTemperature(), getTempFromThermistor(OTHERM_PIN), getTempFromThermistor(ITHERM_PIN), dht.readHumidity());
-  delay(2000);
+  readNewBrink();
+ // delay(2000);
 }
 
 double SteinhartHart(double R) {

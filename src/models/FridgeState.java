@@ -6,7 +6,7 @@ import java.util.Date;
 public class FridgeState {
 
     private Date measuredAt;
-    private int brink;
+    private float brink;
     private ArrayList<Measurement> measurements;
 
     public FridgeState() {
@@ -21,7 +21,7 @@ public class FridgeState {
         this.measuredAt = measuredAt;
     }
 
-    public int getBrink() {
+    public float getBrink() {
         return brink;
     }
 
