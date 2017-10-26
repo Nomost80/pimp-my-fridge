@@ -14,11 +14,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
-    static final boolean BDD = true;
+    static final boolean BDD = false;
     private DB_ValuesSensors db ;
 
     private static final Logger logger = Logger.getLogger("SerialPublisher");
-    final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private List<SerialSubscription> subscriptions = Collections.synchronizedList(new ArrayList<SerialSubscription>());
     private final CompletableFuture<Void> terminated = new CompletableFuture<>();
     private ICommunicator<FridgeState> communicator;
@@ -41,6 +41,8 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
 
     @Override
     public void subscribe(Flow.Subscriber<? super FridgeState> subscriber) {
+        if (this.executorService.isShutdown())
+            this.executorService = Executors.newSingleThreadExecutor();
         SerialSubscription subscription = new SerialSubscription(subscriber, this.executorService);
         this.subscriptions.add(subscription);
         subscriber.onSubscribe(subscription);
@@ -114,13 +116,8 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
             this.isCanceled = new AtomicBoolean(false);
         }
 
-        public AtomicBoolean getIsCanceled() {
-            return isCanceled;
-        }
-
         @Override
         public void request(long n) {
-            logger.log(Level.INFO, "request => isCanceled : " + this.isCanceled.get());
             if (this.isCanceled.get())
                 return;
             if (n < 0)
@@ -146,7 +143,9 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
                 } catch (InterruptedException e) {
                     logger.log(Level.SEVERE, e.toString());
                 }
-                if (!this.executor.isShutdown()){
+//                if (this.isCanceled.get())
+//                    return;
+                if (!this.executor.isShutdown()) {
                     this.executor.execute(() -> {
                         FridgeState fridgeState = communicator.readData();
                         logger.log(Level.INFO, "Publishing item");
