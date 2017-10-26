@@ -128,7 +128,8 @@ public class View implements Flow.Subscriber<FridgeState> {
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
         setAutoGapsGroupLayout(panel);
-        panel.setBackground(color);
+        if (color != null)
+            panel.setBackground(color);
         return panel;
     }
 
@@ -337,7 +338,6 @@ public class View implements Flow.Subscriber<FridgeState> {
     private void check_TemperaturesGraphe(){
         if (fridgeStates.size() == 0)
             return;
-        System.out.println("On check les températures");
         TimeSeriesCollection temperaturesCollection = this.publisher.select_TemperaturesSeries(fridgeStates.get(0), LocalDateTime.now().minusHours(hoursPeriodTemperatures).format(formatter), LocalDateTime.now().format(formatter));
         if (temperaturesCollection != null) {
             repaintGraphe(temperaturesCollection, this.graphTemperatures);
@@ -348,7 +348,6 @@ public class View implements Flow.Subscriber<FridgeState> {
     private void check_DampnessGraphe(){
         if (fridgeStates.size() == 0)
             return;
-        System.out.println("On check les humidités");
         TimeSeriesCollection dampnessCollection = this.publisher.select_DampnessSerie(fridgeStates.get(0), LocalDateTime.now().minusHours(hoursPeriodDampness).format(formatter), LocalDateTime.now().format(formatter));
         if (dampnessCollection != null) {
             repaintGraphe(dampnessCollection, this.graphDampness);
@@ -357,7 +356,6 @@ public class View implements Flow.Subscriber<FridgeState> {
     }
 
     private void repaintGraphe(TimeSeriesCollection collection, Graphe graphe){
-        System.out.println("On update le graphe");
         graphe.updateGraphe(collection);
     }
 
@@ -403,9 +401,9 @@ public class View implements Flow.Subscriber<FridgeState> {
             case GOOD: break;
             case WARNING: break;
             case CRITICAL:
-                JOptionPane optionPane = new JOptionPane();
+/*                JOptionPane optionPane = new JOptionPane();
                 optionPane.showMessageDialog(null, "Il y a de la condensation !",
-                        "Attention", JOptionPane.WARNING_MESSAGE);
+                        "Attention", JOptionPane.WARNING_MESSAGE);*/
                 break;
             default: break;
         }

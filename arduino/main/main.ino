@@ -4,10 +4,11 @@
 #include <Time.h>
 #include <ArduinoJson.h>
 #include "DHT.h"
+#include <math.h>
 
 #define DHT_PIN 2
 #define DHT_TYPE DHT22
-#define MOSFET_PIN 8
+#define MOSFET_PIN 9
 #define OTHERM_PIN 1
 #define ITHERM_PIN 0
 #define RS_PIN 12
@@ -50,9 +51,10 @@ void loop() {
   input = dht.readTemperature();
  // Serial.print("Input : ");
  // Serial.println(input);
-
-  pid.Compute();
-  
+  if (!isnan(input))
+    pid.Compute();
+  else
+    output = 255;
   output = 255 - output;
  // Serial.print("Output : ");
  // Serial.println(output);
@@ -88,6 +90,15 @@ double getTempFromThermistor(int pin) {
 
 /* On crée un objet JSON qui comprend les données des captuers */
 void buildData(double ins_temp, double out_temp, double m_temp, double dampness) {
+  if (isnan(ins_temp))
+    ins_temp = -1;
+  if (isnan(out_temp))
+    out_temp = -1;
+  if (isnan(m_temp))
+    m_temp = -1;
+  if (isnan(dampness))
+    dampness = -1;
+  
   const size_t bufferSize = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + 5*JSON_OBJECT_SIZE(3);
   DynamicJsonBuffer jsonBuffer(bufferSize); 
   JsonObject& root = jsonBuffer.createObject();

@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
-    static final boolean BDD = false;
+    static final boolean BDD = true;
     private DB_ValuesSensors db ;
 
     private static final Logger logger = Logger.getLogger("SerialPublisher");

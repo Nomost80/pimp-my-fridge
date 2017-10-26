@@ -71,7 +71,7 @@ public class DB_ValuesSensors extends DBEntity<Value>{
 
     private boolean insertOneValue(Timestamp times, String sensor, String description, Float value)
     {
-        if (value != null)
+        if (value != -1)
         {
             try {
                 final CallableStatement call = this.getConnection().prepareCall(QueryDB.insertValues());
