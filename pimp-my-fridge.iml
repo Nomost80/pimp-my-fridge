@@ -15,5 +15,7 @@
     <orderEntry type="library" name="jcommon-1.0.23" level="project" />
     <orderEntry type="library" name="jfreechart-1.0.19" level="project" />
     <orderEntry type="library" name="jackson-annotations-2.9.21" level="project" />
+    <orderEntry type="library" name="jdatepicker-2.0.3" level="project" />
+    <orderEntry type="library" name="LGoodDatePicker-10.3.1" level="project" />
   </component>
 </module>

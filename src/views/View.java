@@ -1,5 +1,6 @@
 package views;
 
+import com.github.lgooddatepicker.components.DateTimePicker;
 import models.Enum_AlarmStates;
 import models.FridgeState;
 import models.IQuery;
@@ -50,6 +51,13 @@ public class View implements Flow.Subscriber<FridgeState> {
     private JLabel ptRosee;
     private JLabel currentBrink;
     private JLabel pbTitle;
+    private JLabel spacer1;
+    private JLabel spacer2;
+    private JLabel spacer3;
+    private JLabel spacer4;
+    private JLabel sliderTitle;
+    private JLabel warningTemp;
+    private JLabel condensation;
 
     private JComboBox<Integer> periodTemperatures;
     private Graphe graphTemperatures;
@@ -58,6 +66,16 @@ public class View implements Flow.Subscriber<FridgeState> {
 
     private JButton startButton;
     private JButton stopButton;
+    private JButton periodTemp;
+    private JButton periodDampnesss;
+    private JButton submitPeriod;
+
+    private String failureText = "echec de la mesure !";
+
+    private JFrame periodFrame;
+    private JPanel periodPanel;
+    private DateTimePicker startDatePicker;
+    private DateTimePicker endDatePicker;
 
     public View(final String title) {
         TITLE = title;
@@ -87,11 +105,15 @@ public class View implements Flow.Subscriber<FridgeState> {
         this.frame = new JFrame(TITLE);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizeable(true);
-        this.setSize(800, 800);
+        this.setSize(850, 1000);
         this.frame.setLocationRelativeTo(null);
     }
 
     private void buildFrameContent(){
+        this.spacer1 = new JLabel();
+        this.spacer2 = new JLabel();
+        this.spacer3 = new JLabel();
+        this.spacer4 = new JLabel();
         this.panel_Titre = buildTitlePanel();
         this.panel_Graphes = buildGraphesPanel();
         this.panel_Values = buildValuesPanel();
@@ -158,8 +180,12 @@ public class View implements Flow.Subscriber<FridgeState> {
 
     private JPanel buildGraphesPanel(){
         JPanel panel = buildOnePanel(Color.WHITE);
-        this.startButton = new JButton("Start");
-        this.stopButton = new JButton("Stop");
+        this.startButton = new JButton("Lancer la prise des mesures");
+        this.startButton.setBackground(Color.GREEN);
+        this.startButton.setPreferredSize(new Dimension(150, 20));
+        this.stopButton = new JButton("Arrêter la prise des mesures");
+        this.stopButton.setBackground(Color.RED);
+        this.stopButton.setVisible(false);
         this.panel_Graphe1 = buildOnePanel(Color.WHITE);
         this.panel_Graphe2 = buildOnePanel(Color.WHITE);
         JLabel periode1 = new JLabel();
@@ -170,6 +196,34 @@ public class View implements Flow.Subscriber<FridgeState> {
         typeDuree1.setText(" Hour(s)");
         JLabel typeDuree2 = new JLabel();
         typeDuree2.setText(" Hour(s)");
+        this.warningTemp = new JLabel();
+        this.warningTemp.setForeground(Color.RED);
+        this.warningTemp.setText("Température anormalement élevé.\n La porte est surement ouverte !");
+        this.warningTemp.setVisible(false);
+        this.condensation = new JLabel();
+        this.periodTemp = new JButton("Réglage de la période pour la température");
+        this.periodTemp.addActionListener(e -> {
+            periodFrame = new JFrame("Réglage de la période pour la température");
+            periodFrame.setSize(400, 130);
+            periodPanel = new JPanel();
+            periodFrame.setContentPane(periodPanel);
+            startDatePicker = new DateTimePicker();
+            endDatePicker = new DateTimePicker();
+            submitPeriod = new JButton("Valider la période");
+            submitPeriod.addActionListener(e1 -> {
+                LocalDateTime startAt = startDatePicker.getDateTimePermissive();
+                LocalDateTime endAt = startDatePicker.getDateTimePermissive();
+            });
+            periodPanel.add(startDatePicker);
+            periodPanel.add(endDatePicker);
+            periodPanel.add(submitPeriod);
+            periodFrame.setResizable(true);
+            periodFrame.setVisible(true);
+        });
+        this.periodDampnesss = new JButton("Réglage de la période pour l'humidité");
+        this.periodDampnesss.addActionListener(e -> {
+
+        });
         this.periodTemperatures = generateHoursPeriod(hoursPeriodTemperatures - 1, (e -> {
             hoursPeriodTemperatures = (int) periodTemperatures.getSelectedItem();
             check_TemperaturesGraphe();
@@ -182,21 +236,27 @@ public class View implements Flow.Subscriber<FridgeState> {
         layout.setHorizontalGroup(  // MAX : 0.6
                 layout.createParallelGroup()
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(this.startButton, 0, (int) Math.round(this.frame.getWidth() * 0.1), (int) Math.round(this.frame.getWidth() * 0.1))
-                                .addComponent(this.stopButton, 0, (int) Math.round(this.frame.getWidth() * 0.1), (int) Math.round(this.frame.getWidth() * 0.1))
+                                .addComponent(this.startButton, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
+                                .addComponent(this.stopButton, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
                         )
+                        .addComponent(this.spacer4, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
+                        .addComponent(this.periodTemp, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(periode1, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(periodTemperatures, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(typeDuree1, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                         )
                         .addComponent(panel_Graphe1, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
+                        .addComponent(this.periodDampnesss, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(periode2, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(periodDampness, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(typeDuree2, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                         )
                         .addComponent(panel_Graphe2, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
+                        .addComponent(this.spacer4, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
+                        .addComponent(this.warningTemp, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
+                        .addComponent(this.condensation, 0, (int) Math.round(this.frame.getWidth() * 0.6), Short.MAX_VALUE)
         );
         layout.setVerticalGroup(    // MAX : 0.85
                 layout.createSequentialGroup()
@@ -204,18 +264,24 @@ public class View implements Flow.Subscriber<FridgeState> {
                                 .addComponent(this.startButton, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
                                 .addComponent(this.stopButton, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
                         )
+                        .addComponent(this.spacer4, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
+                        .addComponent(this.periodTemp, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
                         .addGroup(layout.createParallelGroup()
                                 .addComponent(periode1, 0, (int) Math.round(this.frame.getHeight() * 0.03), (int) Math.round(this.frame.getHeight() * 0.03))
                                 .addComponent(periodTemperatures, 0, (int) Math.round(this.frame.getHeight() * 0.03), (int) Math.round(this.frame.getHeight() * 0.03))
                                 .addComponent(typeDuree1, 0, (int) Math.round(this.frame.getHeight() * 0.03), (int) Math.round(this.frame.getHeight() * 0.03))
                         )
                         .addComponent(panel_Graphe1, 0, (int) Math.round(this.frame.getHeight() * 0.25), Short.MAX_VALUE)
+                        .addComponent(this.periodDampnesss, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
                         .addGroup(layout.createParallelGroup()
                                 .addComponent(periode2, 0, (int) Math.round(this.frame.getHeight() * 0.03), (int) Math.round(this.frame.getHeight() * 0.03))
                                 .addComponent(periodDampness, 0, (int) Math.round(this.frame.getHeight() * 0.03), (int) Math.round(this.frame.getHeight() * 0.03))
                                 .addComponent(typeDuree2, 0, (int) Math.round(this.frame.getHeight() * 0.03), (int) Math.round(this.frame.getHeight() * 0.03))
                         )
                         .addComponent(panel_Graphe2, 0, (int) Math.round(this.frame.getHeight() * 0.25), Short.MAX_VALUE)
+                        .addComponent(this.spacer4, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
+                        .addComponent(this.warningTemp, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
+                        .addComponent(this.condensation, 0, (int) Math.round(this.frame.getHeight() * 0.04), (int) Math.round(this.frame.getHeight() * 0.04))
         );
         return panel;
     }
@@ -224,26 +290,32 @@ public class View implements Flow.Subscriber<FridgeState> {
         JPanel panel = buildOnePanel(Color.WHITE);
         this.slider = new JSlider(10, 30, 18);
         this.slider.setToolTipText("Min : " + this.slider.getMinimum() + " - Max : " + this.slider.getMaximum());
-        this.slider.addChangeListener(e -> sliderValue.setText(Integer.toString(slider.getValue())));
+        this.slider.addChangeListener(e -> sliderValue.setText(sliderValue.getText().split(":")[0] + ": " + Integer.toString(slider.getValue())));
         this.button = new JButton("Valider la nouvelle consigne");
+        this.button.setBackground(Color.GREEN);
         this.pbTitle = new JLabel("Progression de l'atteinte de la consigne :");
-        this.sliderValue = new JLabel(Integer.toString(this.slider.getValue()));
+        this.sliderValue = new JLabel("Nouvelle consigne sélectionnée : " + Integer.toString(this.slider.getValue()));
         this.progressBar = new JProgressBar();
         this.insideTemp = new JLabel("Température interne : ");
         this.moduleTemp = new JLabel("Température du module : ");
         this.outsideTemp = new JLabel("Température extérieur : ");
-        this.dampness = new JLabel("Humidité (%) : ");
+        this.dampness = new JLabel("Humidité : ");
         this.ptRosee = new JLabel("Point de rosée : ");
         this.currentBrink = new JLabel("Consigne actuelle : ");
+        this.sliderTitle = new JLabel("Réglage de la consigne :");
         GroupLayout layout = (GroupLayout) panel.getLayout();
         layout.setHorizontalGroup(      // MAX : 0.4
                 layout.createParallelGroup()
                         .addComponent(this.currentBrink, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.spacer1, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.sliderTitle, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.slider, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.sliderValue, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.button, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.spacer2, 0, (int) Math.round(this.frame.getWidth() * 0.2), Short.MAX_VALUE)
                         .addComponent(this.pbTitle, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.progressBar, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
+                        .addComponent(this.spacer3, 0, (int) Math.round(this.frame.getWidth() * 0.2), Short.MAX_VALUE)
                         .addComponent(this.insideTemp, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.moduleTemp, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
                         .addComponent(this.outsideTemp, 0, (int) Math.round(this.frame.getWidth() * 0.4), Short.MAX_VALUE)
@@ -253,11 +325,15 @@ public class View implements Flow.Subscriber<FridgeState> {
         layout.setVerticalGroup(        // MAX : 0.85
                 layout.createSequentialGroup()
                         .addComponent(this.currentBrink, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.spacer1, 0, (int) Math.round(this.frame.getHeight() * 0.02), (int) Math.round(this.frame.getHeight() * 0.02))
+                        .addComponent(this.sliderTitle, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.slider, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.sliderValue, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.button, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.spacer2, 0, (int) Math.round(this.frame.getHeight() * 0.02), (int) Math.round(this.frame.getHeight() * 0.02))
                         .addComponent(this.pbTitle, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.progressBar, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
+                        .addComponent(this.spacer3, 0, (int) Math.round(this.frame.getHeight() * 0.02), (int) Math.round(this.frame.getHeight() * 0.02))
                         .addComponent(this.insideTemp, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.moduleTemp, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
                         .addComponent(this.outsideTemp, 0, (int) Math.round(this.frame.getHeight() * 0.05), (int) Math.round(this.frame.getHeight() * 0.05))
@@ -398,43 +474,101 @@ public class View implements Flow.Subscriber<FridgeState> {
     private void updateDampnessAlarm(Enum_AlarmStates alarmState){
         System.out.println("AlarmState : " + alarmState.toString());
         switch (alarmState){
-            case GOOD: break;
-            case WARNING: break;
+            case GOOD:
+                this.condensation.setForeground(Color.GREEN);
+                this.condensation.setText("Il n'y a pas de condensation !");
+                break;
+            case WARNING:
+                this.condensation.setForeground(Color.ORANGE);
+                this.condensation.setText("Le niveau de condensation est négligeable !");
+                break;
             case CRITICAL:
-/*                JOptionPane optionPane = new JOptionPane();
-                optionPane.showMessageDialog(null, "Il y a de la condensation !",
-                        "Attention", JOptionPane.WARNING_MESSAGE);*/
+                this.condensation.setForeground(Color.RED);
+                this.condensation.setText("Il y a de la condensation !");
                 break;
             default: break;
         }
     }
 
     private void updateProgressBar(FridgeState fridgeState) {
-        int pbMin = 0;
+        int firstInsideTemp = 0;
         for (Measurement measurement : this.fridgeStates.get(0).getMeasurements()) {
             if (Objects.equals(measurement.getLabel(), "Inside temperature"))
-                pbMin = (int)measurement.getValue();
+                firstInsideTemp = (int)measurement.getValue();
         }
-        int pbValue = 0;
+
+        int insideTemp = 0;
         for (Measurement measurement : fridgeState.getMeasurements()) {
             if (Objects.equals(measurement.getLabel(), "Inside temperature"))
-                pbValue = (int)measurement.getValue();
+                insideTemp = (int)measurement.getValue();
         }
-        this.progressBar.setMinimum(pbMin);
-        this.progressBar.setMaximum(fridgeState.getBrink().intValue());
-        this.progressBar.setValue(pbValue);
+
+        int max = firstInsideTemp - fridgeState.getBrink().intValue();
+        int value = insideTemp - fridgeState.getBrink().intValue();
+
+        System.out.println(max);
+        System.out.println(value);
+
+        this.progressBar.setMinimum(0);
+        this.progressBar.setMaximum(max);
+        this.progressBar.setValue(value);
+
+        if (value < max * 0.33)
+            this.progressBar.setForeground(Color.GREEN);
+        else if (value <  max * 0.66)
+            this.progressBar.setForeground(Color.ORANGE);
+        else
+            this.progressBar.setForeground(Color.RED);
     }
 
     private void updateLabels(FridgeState fridgeState) {
         for (Measurement measurement : fridgeState.getMeasurements()) {
-            if (Objects.equals(measurement.getLabel(), "Inside temperature"))
-                this.insideTemp.setText(this.insideTemp.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
-            if (Objects.equals(measurement.getLabel(), "Module temperature"))
-                this.moduleTemp.setText(this.moduleTemp.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
-            if (Objects.equals(measurement.getLabel(), "Outside temperature"))
-                this.outsideTemp.setText(this.outsideTemp.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
-            if (Objects.equals(measurement.getLabel(), "Dampness"))
-                this.dampness.setText(this.dampness.getText().split(":")[0] + ": " + Float.toString(measurement.getValue()));
+            if (Objects.equals(measurement.getLabel(), "Inside temperature")) {
+                String content;
+                if (measurement.getValue() == -1)
+                    content = this.failureText;
+                else
+                    content = Float.toString(measurement.getValue()) + " °C";
+                this.insideTemp.setText(this.insideTemp.getText().split(":")[0] + ": " + content);
+            }
+            if (Objects.equals(measurement.getLabel(), "Module temperature")) {
+                String content;
+                if (measurement.getValue() == -1)
+                    content = this.failureText;
+                else
+                    content = Float.toString(measurement.getValue()) + " °C";
+                this.moduleTemp.setText(this.moduleTemp.getText().split(":")[0] + ": " + content);
+
+            }
+            if (Objects.equals(measurement.getLabel(), "Outside temperature")) {
+                String content;
+                if (measurement.getValue() == -1)
+                    content = this.failureText;
+                else
+                    content = Float.toString(measurement.getValue()) + " °C";
+                this.outsideTemp.setText(this.outsideTemp.getText().split(":")[0] + ": " + content);
+            }
+            if (Objects.equals(measurement.getLabel(), "Dampness")) {
+                String content;
+                if (measurement.getValue() == -1)
+                    content = this.failureText;
+                else
+                    content = Float.toString(measurement.getValue()) + " %";
+                this.dampness.setText(this.dampness.getText().split(":")[0] + ": " + content);
+            }
+        }
+    }
+
+    private void checkTemperature(FridgeState fridgeState) {
+        for (Measurement measurement : this.fridgeStates.get(0).getMeasurements()) {
+            if (Objects.equals(measurement.getLabel(), "Inside temperature")) {
+                for (Measurement msr : fridgeState.getMeasurements()) {
+                    if (Objects.equals(msr.getLabel(), "Inside temperature")) {
+                        if (msr.getValue() > measurement.getValue() + 5)
+                            this.warningTemp.setVisible(true);
+                    }
+                }
+            }
         }
     }
 
@@ -455,10 +589,11 @@ public class View implements Flow.Subscriber<FridgeState> {
         }
         System.out.println("coucou :)");
         this.fridgeStates.add(item);
-        this.currentBrink.setText(this.currentBrink.getText().split(":")[0] + ": " + Float.toString(item.getBrink()));
+        this.currentBrink.setText(this.currentBrink.getText().split(":")[0] + ": " + Float.toString(item.getBrink()) + " °C");
         this.updateProgressBar(item);
         this.updateLabels(item);
-        this.ptRosee.setText(this.ptRosee.getText().split(":")[0] + ": " + this.publisher.pntRosee_Value(item));
+        this.checkTemperature(item);
+        this.ptRosee.setText(this.ptRosee.getText().split(":")[0] + ": " + this.publisher.pntRosee_Value(item) + " °C");
         this.updateDampnessAlarm(this.publisher.pntRosee_Alarm(item));
         subscription.request(1);
     }
