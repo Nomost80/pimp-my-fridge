@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
-    static final boolean BDD = false;
+    static final boolean BDD = true;
     private DB_ValuesSensors db ;
 
     private static final Logger logger = Logger.getLogger("SerialPublisher");
@@ -146,13 +146,15 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
                 } catch (InterruptedException e) {
                     logger.log(Level.SEVERE, e.toString());
                 }
-                this.executor.execute(() -> {
-                    FridgeState fridgeState = communicator.readData();
-                    logger.log(Level.INFO, "Publishing item");
-                    if (BDD)
-                        db.insertAllValues(fridgeState);
-                    this.subscriber.onNext(fridgeState);
-                });
+                if (!this.executor.isShutdown()){
+                    this.executor.execute(() -> {
+                        FridgeState fridgeState = communicator.readData();
+                        logger.log(Level.INFO, "Publishing item");
+                        if (BDD)
+                            db.insertAllValues(fridgeState);
+                        this.subscriber.onNext(fridgeState);
+                    });
+                }
             }
         }
 

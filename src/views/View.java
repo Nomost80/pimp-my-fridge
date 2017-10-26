@@ -159,8 +159,8 @@ public class View implements Flow.Subscriber<FridgeState> {
         JPanel panel = buildOnePanel(Color.WHITE);
         this.startButton = new JButton("Start");
         this.stopButton = new JButton("Stop");
-        this.panel_Graphe1 = buildOnePanel(Color.RED);
-        this.panel_Graphe2 = buildOnePanel(Color.RED);
+        this.panel_Graphe1 = buildOnePanel(Color.WHITE);
+        this.panel_Graphe2 = buildOnePanel(Color.WHITE);
         JLabel periode1 = new JLabel();
         periode1.setText("Temperatures Period: ");
         JLabel periode2 = new JLabel();
@@ -220,7 +220,7 @@ public class View implements Flow.Subscriber<FridgeState> {
     }
 
     private JPanel buildValuesPanel(){
-        JPanel panel = buildOnePanel(Color.YELLOW);
+        JPanel panel = buildOnePanel(Color.WHITE);
         this.slider = new JSlider(10, 30, 18);
         this.slider.setToolTipText("Min : " + this.slider.getMinimum() + " - Max : " + this.slider.getMaximum());
         this.slider.addChangeListener(e -> sliderValue.setText(Integer.toString(slider.getValue())));
@@ -284,8 +284,8 @@ public class View implements Flow.Subscriber<FridgeState> {
     }
 
     private void create_Graphes(){
-        this.graphTemperatures = new Graphe("Temperatures", this.panel_Graphe1);
-        this.graphDampness = new Graphe("Dampness", this.panel_Graphe2);
+        this.graphTemperatures = new Graphe("Temperatures", this.panel_Graphe1, this.frame);
+        this.graphDampness = new Graphe("Dampness", this.panel_Graphe2, this.frame);
     }
 
     private void create_ThreadGraphes(){
@@ -329,6 +329,7 @@ public class View implements Flow.Subscriber<FridgeState> {
     }
 
     private void check_graphes(){
+        System.out.println("On check les graphes");
         check_TemperaturesGraphe();
         check_DampnessGraphe();
     }
@@ -336,6 +337,7 @@ public class View implements Flow.Subscriber<FridgeState> {
     private void check_TemperaturesGraphe(){
         if (fridgeStates.size() == 0)
             return;
+        System.out.println("On check les températures");
         TimeSeriesCollection temperaturesCollection = this.publisher.select_TemperaturesSeries(fridgeStates.get(0), LocalDateTime.now().minusHours(hoursPeriodTemperatures).format(formatter), LocalDateTime.now().format(formatter));
         repaintGraphe(temperaturesCollection, this.graphTemperatures);
     }
@@ -343,12 +345,14 @@ public class View implements Flow.Subscriber<FridgeState> {
     private void check_DampnessGraphe(){
         if (fridgeStates.size() == 0)
             return;
+        System.out.println("On check les humidités");
         TimeSeriesCollection dampnessCollection = this.publisher.select_DampnessSerie(fridgeStates.get(0), LocalDateTime.now().minusHours(hoursPeriodDampness).format(formatter), LocalDateTime.now().format(formatter));
         repaintGraphe(dampnessCollection, this.graphDampness);
     }
 
     private void repaintGraphe(TimeSeriesCollection collection, Graphe graphe){
         if (collection != null){
+            System.out.println("On update le graphe");
             graphe.updateGraphe(collection);
         }
     }
