@@ -2,6 +2,7 @@ package models.db;
 
 import models.FridgeState;
 import models.Measurement;
+import models.SerialPublisher;
 import org.jfree.data.general.SeriesException;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
@@ -12,6 +13,7 @@ import java.sql.*;
 import java.util.Objects;
 
 public class DB_ValuesSensors extends DBEntity<Value>{
+    private final SerialPublisher serialPublisher;
 
     private static abstract class QueryDB {
         static String insertValues(){
@@ -27,9 +29,10 @@ public class DB_ValuesSensors extends DBEntity<Value>{
      *
      * @throws SQLException the SQL exception
      */
-    public DB_ValuesSensors() throws SQLException
+    public DB_ValuesSensors(SerialPublisher serialPublisher) throws SQLException
     {
         super(DBConnection.getInstance().getConnection());
+        this.serialPublisher = serialPublisher;
     }
 
     @Override
@@ -66,6 +69,7 @@ public class DB_ValuesSensors extends DBEntity<Value>{
                 insertOneValue(date, measurement.getSensor(), measurement.getLabel(), measurement.getValue());
             }
             insertOneValue(date, "Brink", "Brink Temperature", fridgeState.getBrink());
+            insertOneValue(date, "Dew", "Dew Point", (float) this.serialPublisher.pntRosee_Value(fridgeState));
         }
     }
 
@@ -97,6 +101,8 @@ public class DB_ValuesSensors extends DBEntity<Value>{
                 col.addSeries(select_Serie(measurement.getSensor(), measurement.getLabel(), dateStart, dateEnd));
             }
         }
+        col.addSeries(select_Serie("Brink", "Brink Temperature", dateStart, dateEnd));
+        col.addSeries(select_Serie("Dew", "Dew Point", dateStart, dateEnd));
         return col;
     }
 
@@ -125,7 +131,7 @@ public class DB_ValuesSensors extends DBEntity<Value>{
             while (resultSet.next()) {
         //        System.out.println("Date reçue : " + resultSet.getTimestamp("Times"));
         //        System.out.println("Second : " + new Second(resultSet.getTimestamp("Times")));
-                Second times = new Second(resultSet.getTime("Times"));
+                Second times = new Second(resultSet.getTimestamp("Times"));
                 Float value = resultSet.getFloat("Val");
                 TimeSeriesDataItem item = new TimeSeriesDataItem(times, value);
                 series.add(item);

@@ -1,0 +1,1 @@
+DELETE FROM `PimpMyFridge_Project`.`FridgeStates` WHERE ((`FridgeStates`.`Val` < 0) OR (`FridgeStates`.`Val` > 100));

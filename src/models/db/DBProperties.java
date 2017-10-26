@@ -40,14 +40,12 @@ class DBProperties extends Properties {
         //inputStream = this.getClass().getClassLoader().getResourceAsStream(DBProperties.PROPERTIES_FILE_NAME);
         try{
             inputStream = new FileInputStream(temp);
-            System.out.println("inputStream : " + inputStream);
         }
         catch (final IOException e)
         {
             e.printStackTrace();
         }
         if (inputStream != null) {
-            System.out.println("inputStream : ok ");
             try {
                 this.load(inputStream);
             } catch (final IOException e) {

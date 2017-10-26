@@ -7,4 +7,5 @@ public interface IQuery {
     TimeSeriesCollection select_DampnessSerie(FridgeState fridgeState, String dateStart, String dateEnd);
     double pntRosee_Value(FridgeState fridgeState);
     Enum_AlarmStates pntRosee_Alarm(FridgeState fridgeState);
+    FridgeState getFridgeStateExample();
 }
