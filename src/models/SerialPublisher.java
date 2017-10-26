@@ -143,8 +143,6 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
                 } catch (InterruptedException e) {
                     logger.log(Level.SEVERE, e.toString());
                 }
-//                if (this.isCanceled.get())
-//                    return;
                 if (!this.executor.isShutdown()) {
                     this.executor.execute(() -> {
                         FridgeState fridgeState = communicator.readData();

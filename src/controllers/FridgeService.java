@@ -22,12 +22,16 @@ public class FridgeService implements IFridgeService {
             if (communicator.isSerialPortAvailable()){
                 communicator.openPort();
                 publisher.subscribe(view);
+                this.view.getStartButton().setVisible(false);
+                this.view.getStopButton().setVisible(true);
             }
         });
         this.view.getStopButton().addActionListener(e -> {
             if (communicator.isSerialPortAvailable()){
                 view.getSubscription().cancel();
                 communicator.closePort();
+                this.view.getStartButton().setVisible(true);
+                this.view.getStopButton().setVisible(false);
             }
         });
     }
