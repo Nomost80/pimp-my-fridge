@@ -340,6 +340,7 @@ public class View implements Flow.Subscriber<FridgeState> {
         System.out.println("On check les températures");
         TimeSeriesCollection temperaturesCollection = this.publisher.select_TemperaturesSeries(fridgeStates.get(0), LocalDateTime.now().minusHours(hoursPeriodTemperatures).format(formatter), LocalDateTime.now().format(formatter));
         repaintGraphe(temperaturesCollection, this.graphTemperatures);
+        this.graphTemperatures.temperaturesSettings();
     }
 
     private void check_DampnessGraphe(){
@@ -348,6 +349,7 @@ public class View implements Flow.Subscriber<FridgeState> {
         System.out.println("On check les humidités");
         TimeSeriesCollection dampnessCollection = this.publisher.select_DampnessSerie(fridgeStates.get(0), LocalDateTime.now().minusHours(hoursPeriodDampness).format(formatter), LocalDateTime.now().format(formatter));
         repaintGraphe(dampnessCollection, this.graphDampness);
+        this.graphDampness.dampnessSettings();
     }
 
     private void repaintGraphe(TimeSeriesCollection collection, Graphe graphe){
@@ -419,7 +421,7 @@ public class View implements Flow.Subscriber<FridgeState> {
                 pbValue = (int)measurement.getValue();
         }
         this.progressBar.setMinimum(pbMin);
-        this.progressBar.setMaximum((int) fridgeState.getBrink());
+        this.progressBar.setMaximum(fridgeState.getBrink().intValue());
         this.progressBar.setValue(pbValue);
     }
 

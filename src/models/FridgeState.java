@@ -6,7 +6,7 @@ import java.util.Date;
 public class FridgeState {
 
     private Date measuredAt;
-    private float brink;
+    private Float brink;
     private ArrayList<Measurement> measurements;
 
     public FridgeState() {
@@ -21,11 +21,11 @@ public class FridgeState {
         this.measuredAt = measuredAt;
     }
 
-    public float getBrink() {
+    public Float getBrink() {
         return brink;
     }
 
-    public void setBrink(int brink) {
+    public void setBrink(Float brink) {
         this.brink = brink;
     }
 
@@ -35,14 +35,5 @@ public class FridgeState {
 
     public void setMeasurements(ArrayList<Measurement> measurements) {
         this.measurements = measurements;
-    }
-
-    @Override
-    public String toString() {
-        String str = String.format("measured_at: %s - brink: %d - measurements:", this.measuredAt, this.brink);
-        for (Measurement measurement : this.measurements)
-            str += String.format("sensor: %s - label: %s - value: %f", measurement.getSensor(), measurement.getLabel()
-            , measurement.getValue());
-        return str;
     }
 }

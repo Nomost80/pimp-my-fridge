@@ -14,14 +14,11 @@ import java.util.Objects;
 public class DB_ValuesSensors extends DBEntity<Value>{
 
     private static abstract class QueryDB {
-        public static String insertValues(){
+        static String insertValues(){
             return "{CALL insert_Values(?, ?, ?, ?)}" ;
         }
-        public static String selectValuesFromSensor(){
+        static String selectValuesFromSensor(){
             return "{CALL select_ValuesFromSensor(?, ?, ?, ?)}" ;
-        }
-        public static String selectSensorsDescriptions(){
-            return "{CALL select_SensorDescription(?)}" ;
         }
     }
 
@@ -72,18 +69,21 @@ public class DB_ValuesSensors extends DBEntity<Value>{
         }
     }
 
-    private boolean insertOneValue(Timestamp times, String sensor, String description, float value)
+    private boolean insertOneValue(Timestamp times, String sensor, String description, Float value)
     {
-        try {
-            final CallableStatement call = this.getConnection().prepareCall(QueryDB.insertValues());
-            call.setTimestamp(1, times);
-            call.setString(2, sensor);
-            call.setString(3, description);
-            call.setFloat(4, value);
-            call.execute();
-            return true ;
-        } catch (final SQLException e) {
-            e.printStackTrace();
+        if (value != null)
+        {
+            try {
+                final CallableStatement call = this.getConnection().prepareCall(QueryDB.insertValues());
+                call.setTimestamp(1, times);
+                call.setString(2, sensor);
+                call.setString(3, description);
+                call.setFloat(4, value);
+                call.execute();
+                return true ;
+            } catch (final SQLException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
