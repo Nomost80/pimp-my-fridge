@@ -19,13 +19,17 @@ class Graphe {
     private final String title;
     private final JPanel jPanel;
     private final JFrame jFrame;
+    private final float widthFactor;
+    private final float heightFactor;
     private XYPlot plot;
     private XYLineAndShapeRenderer renderer;
 
-    Graphe(final String name, final JPanel jPanel, final JFrame jFrame) {
+    Graphe(final String name, final JPanel jPanel, final JFrame jFrame, final float widthFactor, final float heightFactor) {
         this.title = name;
         this.jPanel = jPanel;
         this.jFrame = jFrame;
+        this.widthFactor = widthFactor;
+        this.heightFactor = heightFactor;
     }
 
     void updateGraphe(XYDataset dataset){
@@ -51,6 +55,7 @@ class Graphe {
         this.renderer.setSeriesStroke(1, new BasicStroke(3));
         this.renderer.setSeriesStroke(2, new BasicStroke(3));
         this.renderer.setSeriesStroke(3, new BasicStroke(3));
+        this.renderer.setSeriesStroke(4, new BasicStroke(3));
     //    NumberAxis domain = (NumberAxis) plot.getDomainAxis();
     //    domain.setRange(10.00, 32.00);
         //    domain.setTickUnit(new NumberTickUnit(1));
@@ -77,11 +82,11 @@ class Graphe {
         GroupLayout layout = (GroupLayout) this.jPanel.getLayout();
         layout.setHorizontalGroup(      // MAX : 0.6
                 layout.createSequentialGroup()
-                        .addComponent(this.chartPanel, 0, (int) Math.round(this.jFrame.getWidth() * 0.6), Short.MAX_VALUE)
+                        .addComponent(this.chartPanel, 0, (int) Math.round(this.jFrame.getWidth() * this.widthFactor), Short.MAX_VALUE)
         );
         layout.setVerticalGroup(      // MAX : 0.25
                 layout.createSequentialGroup()
-                        .addComponent(this.chartPanel, 0, (int) Math.round(this.jFrame.getHeight() * 0.25), Short.MAX_VALUE)
+                        .addComponent(this.chartPanel, 0, (int) Math.round(this.jFrame.getHeight() * this.heightFactor), Short.MAX_VALUE)
         );
     }
 

@@ -44,9 +44,9 @@ final class DBConnection {
         final DBProperties dbProperties = new DBProperties();
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            System.out.println("URL : " + dbProperties.getUrl());
-            System.out.println("getLogin : " + dbProperties.getLogin());
-            System.out.println("getPassword : " + dbProperties.getPassword());
+    //        System.out.println("URL : " + dbProperties.getUrl());
+    //        System.out.println("getLogin : " + dbProperties.getLogin());
+    //        System.out.println("getPassword : " + dbProperties.getPassword());
             this.connection = DriverManager.getConnection(dbProperties.getUrl(), dbProperties.getLogin(), dbProperties.getPassword());
             return true;
         } catch (final ClassNotFoundException e) {

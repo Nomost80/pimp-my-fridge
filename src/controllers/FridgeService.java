@@ -4,7 +4,6 @@ import models.*;
 import views.View;
 
 public class FridgeService implements IFridgeService {
-
     private View view;
     private static final ICommunicator<FridgeState> communicator = new Communicator();
     private static final SerialPublisher publisher = new SerialPublisher(communicator);

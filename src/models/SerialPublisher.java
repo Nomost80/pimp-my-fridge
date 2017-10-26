@@ -4,10 +4,7 @@ import models.db.DB_ValuesSensors;
 import org.jfree.data.time.TimeSeriesCollection;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -29,10 +26,11 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
     }
 
     private void startBDD(){
+        System.out.println("BDD : " + BDD);
         if (BDD)
         {
             try {
-                this.db = new DB_ValuesSensors();
+                this.db = new DB_ValuesSensors(this);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -101,6 +99,21 @@ public class SerialPublisher implements Flow.Publisher<FridgeState>, IQuery {
             return Enum_AlarmStates.WARNING;
         else
             return Enum_AlarmStates.CRITICAL;
+    }
+
+    @Override
+    public FridgeState getFridgeStateExample() {
+        FridgeState fridgeState = new FridgeState();
+        fridgeState.setBrink((float) 18);
+        fridgeState.setMeasuredAt(new Date());
+        ArrayList<Measurement> m = new ArrayList<>();
+        Measurement m1 = new Measurement(); m1.setLabel("Inside temperature"); m1.setSensor("dht22");
+        Measurement m2 = new Measurement(); m2.setLabel("Outside temperature"); m2.setSensor("thermistor");
+        Measurement m3 = new Measurement(); m3.setLabel("Module temperature"); m3.setSensor("thermistor");
+        Measurement m4 = new Measurement(); m4.setLabel("Dampness"); m4.setSensor("dht22");
+        m.add(m1); m.add(m2); m.add(m3); m.add(m4);
+        fridgeState.setMeasurements(m);
+        return fridgeState;
     }
 
     private class SerialSubscription implements Flow.Subscription {
